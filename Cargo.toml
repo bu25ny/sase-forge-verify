@@ -1,0 +1,166 @@
+[package]
+name = "sase-license-core"
+version = "0.1.0"
+edition = "2021"
+description = "SASE licensing engine - no_std, WASM compatible, zero-heap hot paths"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/sase-license/sase-license-core"
+keywords = ["sase", "license", "licensing", "ed25519", "tpm", "merkle", "no_std", "wasm"]
+categories = ["cryptography", "security", "wasm", "no-std", "embedded"]
+
+[package.metadata.docs.rs]
+features = ["std", "python", "tpm", "sqlite", "wasm"]
+all-features = true
+
+[features]
+default = ["std"]
+
+# Standard library support (required for most features)
+std = [
+    "ed25519-dalek/std",
+    "ed25519-dalek/rand_core",
+    "dep:postcard",
+    "bitflags/std",
+    "bitflags/serde",
+    "heapless/serde",
+    "zeroize/std",
+    "zeroize/zeroize_derive",
+    "getrandom/std",
+    "sha2/std",
+    "dep:serde",
+    "dep:serde_bytes",
+    "signature/std",
+    "dep:rand",
+    "rand/getrandom",
+    "dep:blake3",
+    "dep:serde_json",
+    "dep:chrono",
+    "dep:sha2",
+    "dep:thiserror",
+]
+
+# no_std with alloc support
+alloc = [
+    "dep:ed25519-dalek",
+    "ed25519-dalek/zeroize",
+    "dep:postcard",
+    "dep:bitflags",
+    "bitflags/serde",
+    "dep:heapless",
+    "dep:zeroize",
+    "zeroize/zeroize_derive",
+    "dep:getrandom",
+    "dep:sha2",
+    "dep:serde",
+    "dep:serde_bytes",
+    "dep:signature",
+    "dep:rand",
+    "rand/getrandom",
+    "dep:blake3",
+    "dep:serde_json",
+    "dep:chrono",
+    "dep:sha2",
+    "dep:thiserror",
+]
+
+# no_std crypto support (zero-heap verification path)
+crypto = ["dep:ed25519-dalek", "ed25519-dalek/zeroize", "dep:zeroize", "zeroize/zeroize_derive", "dep:signature", "dep:sha2", "dep:bitflags", "dep:heapless", "dep:const_fn", "dep:thiserror"]
+
+# Python bindings via PyO3
+python = ["std", "pyo3"]
+
+# TPM2 integration via TSS-ESAPI
+tpm = ["std", "tss-esapi"]
+
+# SQLite WAL backend for Merkle DAG
+sqlite = ["std", "rusqlite", "dep:serde_json", "dep:chrono", "dep:sha2"]
+
+# WASM target support
+wasm = [
+    "dep:ed25519-dalek",
+    "dep:postcard",
+    "dep:serde",
+    "dep:bitflags",
+    "dep:heapless",
+    "dep:zeroize",
+    "zeroize/zeroize_derive",
+    "getrandom/js",
+    "dep:sha2",
+    "dep:signature",
+]
+
+# Const fn support
+const_fn = ["dep:const_fn"]
+
+# Zeroize for secret zeroization
+zeroize = ["dep:zeroize", "zeroize/zeroize_derive"]
+
+[dependencies]
+# Core no_std dependencies
+bitflags = { version = "2.5", default-features = false, features = ["serde"], optional = true }
+heapless = { version = "0.8", default-features = false, features = ["serde"], optional = true }
+zeroize = { version = "1.9", default-features = false, features = ["zeroize_derive"], optional = true }
+const_fn = { version = "0.4", default-features = false, optional = true }
+thiserror = { version = "1.0", optional = true }
+
+# Ed25519 signature verification (no_std, zeroize support)
+ed25519-dalek = { version = "2.2", default-features = false, features = ["zeroize"], optional = true }
+signature = { version = "2.2", default-features = false, optional = true }
+
+# Serialization
+postcard = { version = "1.1", default-features = false, features = ["alloc"], optional = true }
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"], optional = true }
+serde_bytes = { version = "0.11", default-features = false, optional = true }
+
+# TPM2 integration (std only) - use newer version to avoid yanked dependency
+tss-esapi = { version = "7.0", optional = true, default-features = false }
+
+# SQLite WAL backend (std feature only)
+rusqlite = { version = "0.31", optional = true, default-features = false, features = ["bundled"] }
+serde_json = { version = "1.0", optional = true }
+chrono = { version = "0.4", optional = true, default-features = false, features = ["std"] }
+sha2 = { version = "0.10", optional = true, default-features = false, features = ["std"] }
+
+# Python bindings
+pyo3 = { version = "0.23", optional = true, default-features = false }
+
+# WASM support
+getrandom = { version = "0.2", optional = true, default-features = false }
+
+# BLAKE3 for key ID computation (std feature)
+blake3 = { version = "1.5", optional = true, default-features = false }
+
+# Random number generation (std feature)
+rand = { version = "0.8", optional = true, default-features = false }
+
+[dev-dependencies]
+# Testing dependencies (std only)
+ed25519-dalek = { version = "2.2", features = ["std", "zeroize"] }
+rand = { version = "0.8", features = ["std"] }
+tempfile = "3.8"
+tempdir = "0.3"
+hex = "0.4"
+postcard = { version = "1.1", features = ["use-std"] }
+serde = { version = "1.0", features = ["derive", "std"] }
+serde_json = "1.0"
+blake3 = "1.5"
+sha2 = { version = "0.10", features = ["std"] }
+chrono = { version = "0.4", features = ["std"] }
+
+# Build script
+[build-dependencies]
+heck = "0.4"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+# Zero-heap enforcement via compile flag
+# RUSTFLAGS="-DSASE_ZERO_HEAP=1" cargo build --no-default-features --target wasm32-unknown-unknown
