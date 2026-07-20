@@ -8,7 +8,7 @@ use core::fmt;
 use core::str::FromStr;
 #[cfg(any(feature = "std", feature = "alloc"))]
 use serde::{Deserialize, Serialize};
-use crate::features::FeatureSet;
+use crate::features::{FeatureSet, Feature};
 
 /// SASE License Tiers in ascending order of capabilities
 ///
@@ -254,53 +254,53 @@ impl LicenseTier {
     /// Const version of default_features
     #[inline(always)]
     pub const fn const_default_features(self) -> FeatureSet {
-        let mut features = FeatureSet::empty();
-        match self {
+        // Use raw bitwise operations on u64 to avoid non-const bitflags operations
+        let bits: u64 = match self {
             LicenseTier::Free => {
-                features.insert(Feature::SaseBasic.into());
+                Feature::SaseBasic.bit().bits()
             }
             LicenseTier::Base => {
-                features.insert(Feature::SaseBasic.into());
-                features.insert(Feature::SaseAdvanced.into());
-                features.insert(Feature::VpnBasic.into());
+                Feature::SaseBasic.bit().bits()
+                | Feature::SaseAdvanced.bit().bits()
+                | Feature::VpnBasic.bit().bits()
             }
             LicenseTier::Pro => {
-                features.insert(Feature::SaseBasic.into());
-                features.insert(Feature::SaseAdvanced.into());
-                features.insert(Feature::VpnBasic.into());
-                features.insert(Feature::VpnAdvanced.into());
-                features.insert(Feature::ZeroTrust.into());
-                features.insert(Feature::DlpBasic.into());
+                Feature::SaseBasic.bit().bits()
+                | Feature::SaseAdvanced.bit().bits()
+                | Feature::VpnBasic.bit().bits()
+                | Feature::VpnAdvanced.bit().bits()
+                | Feature::ZeroTrust.bit().bits()
+                | Feature::DlpBasic.bit().bits()
             }
             LicenseTier::Engineering => {
-                features.insert(Feature::SaseBasic.into());
-                features.insert(Feature::SaseAdvanced.into());
-                features.insert(Feature::VpnBasic.into());
-                features.insert(Feature::VpnAdvanced.into());
-                features.insert(Feature::ZeroTrust.into());
-                features.insert(Feature::DlpBasic.into());
-                features.insert(Feature::DlpAdvanced.into());
-                features.insert(Feature::ApiAccess.into());
-                features.insert(Feature::CustomPolicies.into());
+                Feature::SaseBasic.bit().bits()
+                | Feature::SaseAdvanced.bit().bits()
+                | Feature::VpnBasic.bit().bits()
+                | Feature::VpnAdvanced.bit().bits()
+                | Feature::ZeroTrust.bit().bits()
+                | Feature::DlpBasic.bit().bits()
+                | Feature::DlpAdvanced.bit().bits()
+                | Feature::ApiAccess.bit().bits()
+                | Feature::CustomPolicies.bit().bits()
             }
             LicenseTier::Sovereign => {
-                features.insert(Feature::SaseBasic.into());
-                features.insert(Feature::SaseAdvanced.into());
-                features.insert(Feature::VpnBasic.into());
-                features.insert(Feature::VpnAdvanced.into());
-                features.insert(Feature::ZeroTrust.into());
-                features.insert(Feature::DlpBasic.into());
-                features.insert(Feature::DlpAdvanced.into());
-                features.insert(Feature::ApiAccess.into());
-                features.insert(Feature::CustomPolicies.into());
-                features.insert(Feature::DataSovereignty.into());
-                features.insert(Feature::GeoFencing.into());
+                Feature::SaseBasic.bit().bits()
+                | Feature::SaseAdvanced.bit().bits()
+                | Feature::VpnBasic.bit().bits()
+                | Feature::VpnAdvanced.bit().bits()
+                | Feature::ZeroTrust.bit().bits()
+                | Feature::DlpBasic.bit().bits()
+                | Feature::DlpAdvanced.bit().bits()
+                | Feature::ApiAccess.bit().bits()
+                | Feature::CustomPolicies.bit().bits()
+                | Feature::DataSovereignty.bit().bits()
+                | Feature::GeoFencing.bit().bits()
             }
             LicenseTier::Government => {
-                features = FeatureSet::from_bits_retain(u64::MAX);
+                u64::MAX
             }
-        }
-        features
+        };
+        FeatureSet::from_bits_retain(bits)
     }
 }
 

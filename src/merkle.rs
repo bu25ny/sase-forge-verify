@@ -451,8 +451,10 @@ impl MerkleLog for MemoryMerkleLog {
 pub mod sqlite {
     use super::*;
     use rusqlite::{Connection, params, OptionalExtension};
-    use std::path::Path;
     use std::sync::{Arc, Mutex};
+    use std::format;
+    use std::string::{ToString, String};
+    use std::vec::Vec;
 
     /// SQLite Merkle log configuration
     #[derive(Debug, Clone)]
@@ -471,7 +473,7 @@ pub mod sqlite {
         fn default() -> Self {
             Self {
                 path: ":memory:".to_string(),
-                wal_mode: true,
+                wal_mode: false,
                 synchronous: SynchronousMode::Normal,
                 cache_size: -2000, // 2MB
             }
@@ -517,27 +519,33 @@ pub mod sqlite {
             // Create tables
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS merkle_leaves (
-                    index INTEGER PRIMARY KEY,
+                    index_val INTEGER PRIMARY KEY,
                     hash BLOB NOT NULL,
                     data_hash BLOB,
                     timestamp INTEGER NOT NULL,
                     data BLOB
                 )",
                 [],
-            ).map_err(|_| MerkleError::DatabaseError("Failed to create leaves table"))?;
+            ).map_err(|e| {
+                std::eprintln!("SQLITE LEAVES TABLE CREATION ERROR: {:?}", e);
+                MerkleError::DatabaseError("Failed to create leaves table")
+            })?;
 
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS merkle_nodes (
                     depth INTEGER NOT NULL,
-                    index INTEGER NOT NULL,
+                    index_val INTEGER NOT NULL,
                     hash BLOB NOT NULL,
                     left_hash BLOB,
                     right_hash BLOB,
                     timestamp INTEGER NOT NULL,
-                    PRIMARY KEY (depth, index)
+                    PRIMARY KEY (depth, index_val)
                 )",
                 [],
-            ).map_err(|_| MerkleError::DatabaseError("Failed to create nodes table"))?;
+            ).map_err(|e| {
+                std::eprintln!("SQLITE NODES TABLE CREATION ERROR: {:?}", e);
+                MerkleError::DatabaseError("Failed to create nodes table")
+            })?;
 
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS merkle_metadata (
@@ -576,12 +584,13 @@ pub mod sqlite {
             let conn = self.conn.lock().map_err(|_| MerkleError::DatabaseError("Lock poisoned"))?;
 
             let mut stmt = conn.prepare(
-                "SELECT hash FROM merkle_leaves ORDER BY index"
+                "SELECT hash FROM merkle_leaves ORDER BY index_val"
             ).map_err(|_| MerkleError::DatabaseError("Failed to prepare statement"))?;
 
             let hashes: Vec<[u8; 32]> = stmt.query_map([], |row| {
                 let mut hash = [0u8; 32];
-                row.get_ref(0)?.as_blob()?.copy_to_slice(&mut hash);
+                let blob = row.get_ref(0)?.as_blob()?;
+                hash.copy_from_slice(&blob[..32.min(blob.len())]);
                 Ok(hash)
             }).map_err(|_| MerkleError::DatabaseError("Failed to query leaves"))?
             .collect::<Result<Vec<_>, _>>()
@@ -593,7 +602,7 @@ pub mod sqlite {
                 return Ok(());
             }
 
-            let mut current_level = hashes;
+            let mut current_level = hashes.clone();
             while current_level.len() > 1 {
                 let mut next_level = Vec::with_capacity((current_level.len() + 1) / 2);
                 for chunk in current_level.chunks(2) {
@@ -617,20 +626,24 @@ pub mod sqlite {
 
     impl MerkleLog for SqliteMerkleLog {
         fn append(&mut self, data: &[u8]) -> Result<u64, MerkleError> {
-            let conn = self.conn.lock().map_err(|_| MerkleError::DatabaseError("Lock poisoned"))?;
+            let index;
+            let timestamp;
+            {
+                let conn = self.conn.lock().map_err(|_| MerkleError::DatabaseError("Lock poisoned"))?;
 
-            let index = self.size;
-            let timestamp = self.current_timestamp();
-            let hash = MerkleHash::from_data(data);
-            let data_hash = MerkleHash::from_data(data);
+                index = self.size;
+                timestamp = self.current_timestamp();
+                let hash = MerkleHash::from_data(data);
+                let data_hash = MerkleHash::from_data(data);
 
-            conn.execute(
-                "INSERT INTO merkle_leaves (index, hash, data_hash, timestamp, data) VALUES (?, ?, ?, ?, ?)",
-                params![index, hash.as_bytes(), data_hash.as_bytes(), timestamp, data],
-            ).map_err(|_| MerkleError::DatabaseError("Failed to insert leaf"))?;
+                conn.execute(
+                    "INSERT INTO merkle_leaves (index_val, hash, data_hash, timestamp, data) VALUES (?, ?, ?, ?, ?)",
+                    params![index, hash.as_bytes(), data_hash.as_bytes(), timestamp, data],
+                ).map_err(|_| MerkleError::DatabaseError("Failed to insert leaf"))?;
 
-            self.size += 1;
-            self.timestamp = timestamp;
+                self.size += 1;
+                self.timestamp = timestamp;
+            } // conn guard dropped here, allowing mutable borrow for recompute_root
             self.recompute_root()?;
 
             Ok(index)
@@ -653,12 +666,13 @@ pub mod sqlite {
 
             // Get all leaf hashes
             let mut stmt = conn.prepare(
-                "SELECT hash FROM merkle_leaves ORDER BY index"
+                "SELECT hash FROM merkle_leaves ORDER BY index_val"
             ).map_err(|_| MerkleError::DatabaseError("Failed to prepare statement"))?;
 
             let hashes: Vec<[u8; 32]> = stmt.query_map([], |row| {
                 let mut hash = [0u8; 32];
-                row.get_ref(0)?.as_blob()?.copy_to_slice(&mut hash);
+                let blob = row.get_ref(0)?.as_blob()?;
+                hash.copy_from_slice(&blob[..32.min(blob.len())]);
                 Ok(hash)
             }).map_err(|_| MerkleError::DatabaseError("Failed to query leaves"))?
             .collect::<Result<Vec<_>, _>>()
@@ -730,14 +744,16 @@ pub mod sqlite {
 
             if index < self.size {
                 let mut stmt = conn.prepare(
-                    "SELECT hash, data_hash, timestamp FROM merkle_leaves WHERE index = ?"
+                    "SELECT hash, data_hash, timestamp FROM merkle_leaves WHERE index_val = ?"
                 ).map_err(|_| MerkleError::DatabaseError("Failed to prepare statement"))?;
 
                 let row = stmt.query_row(params![index], |row| {
                     let mut hash = [0u8; 32];
                     let mut data_hash = [0u8; 32];
-                    row.get_ref(0)?.as_blob()?.copy_to_slice(&mut hash)?;
-                    row.get_ref(1)?.as_blob()?.copy_to_slice(&mut data_hash)?;
+                    let blob0 = row.get_ref(0)?.as_blob()?;
+                    hash.copy_from_slice(&blob0[..32.min(blob0.len())]);
+                    let blob1 = row.get_ref(1)?.as_blob()?;
+                    data_hash.copy_from_slice(&blob1[..32.min(blob1.len())]);
                     let timestamp: u64 = row.get(2)?;
                     Ok((hash, data_hash, timestamp))
                 }).optional().map_err(|_| MerkleError::DatabaseError("Failed to query leaf"))?;
@@ -764,7 +780,7 @@ pub mod sqlite {
             let conn = self.conn.lock().map_err(|_| MerkleError::DatabaseError("Lock poisoned"))?;
 
             let mut stmt = conn.prepare(
-                "SELECT depth, index, hash, left_hash, right_hash, timestamp FROM merkle_nodes WHERE depth = ? ORDER BY index"
+                "SELECT depth, index_val, hash, left_hash, right_hash, timestamp FROM merkle_nodes WHERE depth = ? ORDER BY index_val"
             ).map_err(|_| MerkleError::DatabaseError("Failed to prepare statement"))?;
 
             let mut nodes = heapless::Vec::new();
@@ -772,9 +788,12 @@ pub mod sqlite {
                 let mut hash = [0u8; 32];
                 let mut left = [0u8; 32];
                 let mut right = [0u8; 32];
-                row.get_ref(2)?.as_blob()?.copy_to_slice(&mut hash)?;
-                row.get_ref(3)?.as_blob()?.copy_to_slice(&mut left)?;
-                row.get_ref(4)?.as_blob()?.copy_to_slice(&mut right)?;
+                let b2 = row.get_ref(2)?.as_blob()?;
+                hash.copy_from_slice(&b2[..32.min(b2.len())]);
+                let b3 = row.get_ref(3)?.as_blob()?;
+                left.copy_from_slice(&b3[..32.min(b3.len())]);
+                let b4 = row.get_ref(4)?.as_blob()?;
+                right.copy_from_slice(&b4[..32.min(b4.len())]);
                 let index: u64 = row.get(1)?;
                 let timestamp: u64 = row.get(5)?;
                 Ok((index, hash, left, right, timestamp))

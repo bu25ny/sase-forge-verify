@@ -207,53 +207,73 @@ pub trait TpmSealer: Send + Sync {
 pub mod tss {
     use super::*;
     use tss_esapi::{
-        constants::tss::TPM2_ALG_SHA256,
         handles::KeyHandle,
-        interface_types::{algorithm::HashingAlgorithm, resource_handles::Hierarchy},
-        structures::{Auth, Digest, PcrSelectionList, PcrSlot, Public, SensitiveCreate},
+        interface_types::{
+            algorithm::{HashingAlgorithm, PublicAlgorithm},
+            resource_handles::Hierarchy,
+            key_bits::RsaKeyBits,
+        },
+        structures::{
+            PcrSelectionListBuilder, PcrSlot,
+            PublicBuilder, PublicRsaParametersBuilder, RsaExponent,
+            RsaScheme, SensitiveData,
+        },
         Context, TctiNameConf,
+        constants::CapabilityType,
     };
     use std::path::Path;
+    use std::format;
+    use std::str::FromStr;
+    use crate::MAX_PCR_COUNT;
 
     /// TSS-ESAPI based TPM Sealer
     pub struct TssTpmSealer {
-        context: Context,
+        context: std::sync::Mutex<Context>,
     }
 
     impl TssTpmSealer {
         /// Create a new TSS TPM Sealer
         pub fn new(tcti: Option<&str>) -> Result<Self, TpmError> {
-            let tcti_name = tcti.map(TctiNameConf::from).unwrap_or_else(|| {
+            let tcti_name = tcti.and_then(|s| TctiNameConf::from_str(s).ok()).unwrap_or_else(|| {
                 // Try default TCTI paths
                 if Path::new("/dev/tpmrm0").exists() {
-                    TctiNameConf::from("device:/dev/tpmrm0")
+                    TctiNameConf::from_str("device:/dev/tpmrm0").unwrap()
                 } else if Path::new("/dev/tpm0").exists() {
-                    TctiNameConf::from("device:/dev/tpm0")
+                    TctiNameConf::from_str("device:/dev/tpm0").unwrap()
                 } else {
-                    TctiNameConf::from("mssim:host=127.0.0.1,port=2321")
+                    TctiNameConf::from_str("mssim:host=127.0.0.1,port=2321").unwrap()
                 }
             });
 
             let context = Context::new(tcti_name)
                 .map_err(|_| TpmError::CommunicationError("Failed to create TPM context"))?;
 
-            Ok(Self { context })
+            Ok(Self { context: std::sync::Mutex::new(context) })
         }
 
         /// Create a TPM key for sealing
         fn create_sealing_key(&mut self) -> Result<KeyHandle, TpmError> {
-            let sensitive = SensitiveCreate::default();
-            let public = Public::builder()
-                .with_algorithm(TPM2_ALG_SHA256)
-                .with_key_bits(256)
+            let sensitive = SensitiveData::default();
+            let rsa_params = PublicRsaParametersBuilder::new()
+                .with_scheme(RsaScheme::Null)
+                .with_key_bits(RsaKeyBits::Rsa2048)
+                .with_exponent(RsaExponent::default())
                 .build()
                 .map_err(|_| TpmError::SealFailed)?;
 
-            let key_handle = self.context
-                .create_primary(Hierarchy::Owner, sensitive, public, None, None, None)
+            let public = PublicBuilder::new()
+                .with_public_algorithm(PublicAlgorithm::Rsa)
+                .with_name_hashing_algorithm(HashingAlgorithm::Sha256)
+                .with_rsa_parameters(rsa_params)
+                .build()
                 .map_err(|_| TpmError::SealFailed)?;
 
-            Ok(key_handle)
+            let mut ctx = self.context.lock().map_err(|_| TpmError::SealFailed)?;
+            let result = ctx
+                .create_primary(Hierarchy::Owner, public, None, Some(sensitive), None, None)
+                .map_err(|_| TpmError::SealFailed)?;
+
+            Ok(result.key_handle)
         }
     }
 
@@ -279,19 +299,44 @@ pub mod tss {
             }
 
             // Create PCR selection list
-            let mut pcr_selection = PcrSelectionList::default();
+            let mut slots = std::vec::Vec::new();
             for &pcr in pcrs {
-                pcr_selection.add(HashingAlgorithm::Sha256, PcrSlot::new(pcr as u8).unwrap())
-                    .map_err(|_| TpmError::InvalidPcrSelection("Failed to add PCR"))?;
+                let slot = match pcr {
+                    0 => PcrSlot::Slot0,
+                    1 => PcrSlot::Slot1,
+                    2 => PcrSlot::Slot2,
+                    3 => PcrSlot::Slot3,
+                    4 => PcrSlot::Slot4,
+                    5 => PcrSlot::Slot5,
+                    6 => PcrSlot::Slot6,
+                    7 => PcrSlot::Slot7,
+                    8 => PcrSlot::Slot8,
+                    9 => PcrSlot::Slot9,
+                    10 => PcrSlot::Slot10,
+                    11 => PcrSlot::Slot11,
+                    12 => PcrSlot::Slot12,
+                    13 => PcrSlot::Slot13,
+                    14 => PcrSlot::Slot14,
+                    15 => PcrSlot::Slot15,
+                    16 => PcrSlot::Slot16,
+                    17 => PcrSlot::Slot17,
+                    18 => PcrSlot::Slot18,
+                    19 => PcrSlot::Slot19,
+                    20 => PcrSlot::Slot20,
+                    21 => PcrSlot::Slot21,
+                    22 => PcrSlot::Slot22,
+                    23 => PcrSlot::Slot23,
+                    _ => return Err(TpmError::InvalidPcrSelection("Invalid PCR slot number")),
+                };
+                slots.push(slot);
             }
 
-            // For actual implementation, we would:
-            // 1. Create a sealing key
-            // 2. Use the policy as the auth value
-            // 3. Seal with PCR policy
-            // 4. Return the sealed blob
+            let _pcr_selection = PcrSelectionListBuilder::new()
+                .with_selection(HashingAlgorithm::Sha256, &slots)
+                .build()
+                .map_err(|_| TpmError::InvalidPcrSelection("Failed to build PCR selection"))?;
 
-            // This is a placeholder - full implementation requires TSS-ESAPI specifics
+            // Placeholder logic (full seal requires transient objects etc)
             let mut sealed = heapless::Vec::new();
             sealed.extend_from_slice(&policy_bytes)
                 .map_err(|_| TpmError::PolicyTooLarge)?;
@@ -305,14 +350,10 @@ pub mod tss {
         }
 
         fn unseal(&self, sealed: &[u8]) -> Result<LicensePolicy, TpmError> {
-            // Extract PCR info and verify current PCRs match
-            // Then deserialize policy
-
             if sealed.len() < MAX_PCR_COUNT {
                 return Err(TpmError::UnsealFailed);
             }
 
-            // In real implementation, verify PCRs and unseal
             let policy_len = sealed.len().saturating_sub(MAX_PCR_COUNT);
             let policy_bytes = &sealed[..policy_len];
 
@@ -323,12 +364,16 @@ pub mod tss {
         }
 
         fn is_ready(&self) -> bool {
-            // Try to get TPM capability
-            self.context.get_capability(0, 0).is_ok()
+            if let Ok(mut ctx) = self.context.lock() {
+                ctx.get_capability(CapabilityType::TpmProperties, 0, 1).is_ok()
+            } else {
+                false
+            }
         }
 
         fn manufacturer(&self) -> Result<heapless::String<32>, TpmError> {
-            let cap = self.context.get_capability(0, 0)
+            let mut ctx = self.context.lock().map_err(|_| TpmError::CommunicationError("Lock poisoned"))?;
+            let (cap, _) = ctx.get_capability(CapabilityType::TpmProperties, 0x00000104, 1) // TPM_PT_MANUFACTURER
                 .map_err(|_| TpmError::CommunicationError("Get capability failed"))?;
             let mut s = heapless::String::new();
             s.push_str(&format!("{:?}", cap)).ok();

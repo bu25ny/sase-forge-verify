@@ -2,11 +2,15 @@
 name = "sase-forge-verify"
 version = "0.1.0"
 edition = "2021"
-description = "SASE Forge Verify - Sovereign licensing verification runtime. Zero-heap, no_std, TPM2, Merkle-DAG, WASM, Python."
+authors = ["SASE Antigravity Team <licensing@sase-antigravity.dev>"]
+description = "Sovereign licensing verification runtime. Zero-heap, no_std, TPM2, Merkle-DAG audit, WASM & Python ready."
 license = "MIT OR Apache-2.0"
+readme = "README.md"
 repository = "https://github.com/bu25ny/sase-forge-verify"
-keywords = ["sase", "license", "licensing", "ed25519", "tpm", "merkle", "no_std", "wasm", "verify", "forge"]
-categories = ["cryptography", "security", "wasm", "no-std", "embedded"]
+homepage = "https://github.com/bu25ny/sase-forge-verify"
+documentation = "https://docs.rs/sase-forge-verify"
+keywords = ["license", "ed25519", "tpm", "no-std", "wasm"]
+categories = ["cryptography", "authentication", "wasm", "no-std", "embedded"]
 
 [package.metadata.docs.rs]
 features = ["std", "python", "tpm", "sqlite", "wasm"]

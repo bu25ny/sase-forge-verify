@@ -1,18 +1,7 @@
-/*!
- * SASE License Core - SASE Licensing Engine
- *
- * A `no_std` Rust crate for SASE licensing with:
- * - Zero-heap hot paths (`-DSASE_ZERO_HEAP=1` compatible)
- * - WASM compatible (wasm32-unknown-unknown)
- * - Ed25519 verification (heap-free via ed25519-dalek + zeroize)
- * - TPM2 PCR sealing (PCR 0-7 + 16)
- * - Merkle-DAG audit log (SQLite WAL backend, std feature)
- * - postcard (no_std) + serde (std feature) serialization
- * - PyO3 bindings (python feature)
- */
+#![doc = include_str!("../README.md")]
 
 #![no_std]
-#![cfg_attr(feature = "const_fn", feature(const_fn))]
+// Note: feature(const_fn) was removed in Rust 1.54 (split into finer-grained gates)
 #![cfg_attr(all(not(feature = "std"), not(test)), no_main)]
 #![deny(
     trivial_casts,
@@ -75,11 +64,22 @@ pub const PCR_MASK: u32 = 0x0001_00FF;
 pub const PCR_INDICES: [u32; MAX_PCR_COUNT] = [0, 1, 2, 3, 4, 5, 6, 7, 16];
 
 /// Current crate version as a packed u32 (major << 22 | minor << 12 | patch)
-#[cfg(feature = "const_fn")]
+/// Computed via const-compatible byte parsing of CARGO_PKG_VERSION_* env vars
 pub const VERSION: u32 = {
-    let major = env!("CARGO_PKG_VERSION_MAJOR").parse::<u32>().unwrap_or(0);
-    let minor = env!("CARGO_PKG_VERSION_MINOR").parse::<u32>().unwrap_or(0);
-    let patch = env!("CARGO_PKG_VERSION_PATCH").parse::<u32>().unwrap_or(0);
+    /// Parse a decimal ASCII byte string to u32 in const context
+    const fn parse_u32(s: &str) -> u32 {
+        let bytes = s.as_bytes();
+        let mut result = 0u32;
+        let mut i = 0usize;
+        while i < bytes.len() {
+            result = result * 10 + (bytes[i] - b'0') as u32;
+            i += 1;
+        }
+        result
+    }
+    let major = parse_u32(env!("CARGO_PKG_VERSION_MAJOR"));
+    let minor = parse_u32(env!("CARGO_PKG_VERSION_MINOR"));
+    let patch = parse_u32(env!("CARGO_PKG_VERSION_PATCH"));
     (major << 22) | (minor << 12) | patch
 };
 
@@ -95,32 +95,14 @@ pub const FEATURE_WASM: u32 = 1 << 4;
 pub const FEATURE_CONST_FN: u32 = 1 << 5;
 pub const FEATURE_ZEROIZE: u32 = 1 << 6;
 
-/// Compile-time feature flags
-#[cfg(feature = "const_fn")]
-pub const COMPILE_TIME_FEATURES: u32 = {
-    let mut flags = FEATURE_CONST_FN | FEATURE_ZEROIZE;
-    #[cfg(feature = "std")]
-    {
-        flags |= FEATURE_STD;
-    }
-    #[cfg(feature = "python")]
-    {
-        flags |= FEATURE_PYTHON;
-    }
-    #[cfg(feature = "tpm")]
-    {
-        flags |= FEATURE_TPM;
-    }
-    #[cfg(feature = "sqlite")]
-    {
-        flags |= FEATURE_SQLITE;
-    }
-    #[cfg(feature = "wasm")]
-    {
-        flags |= FEATURE_WASM;
-    }
-    flags
-};
+/// Compile-time feature flags bitmask (always computed, no nightly required)
+pub const COMPILE_TIME_FEATURES: u32 =
+    FEATURE_CONST_FN | FEATURE_ZEROIZE
+    | (if cfg!(feature = "std")    { FEATURE_STD    } else { 0 })
+    | (if cfg!(feature = "python") { FEATURE_PYTHON } else { 0 })
+    | (if cfg!(feature = "tpm")    { FEATURE_TPM    } else { 0 })
+    | (if cfg!(feature = "sqlite") { FEATURE_SQLITE } else { 0 })
+    | (if cfg!(feature = "wasm")   { FEATURE_WASM   } else { 0 });
 
 /// Error type for the crate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -275,8 +257,7 @@ pub trait NoStdDeserialize: Sized {
     fn deserialize_from(buf: &[u8]) -> Result<Self, LicenseError>;
 }
 
-// Compile-time assertions for constant sizes
-#[cfg(feature = "const_fn")]
+// Compile-time assertions for constant sizes (stable since Rust 1.57, no nightly needed)
 const _: () = {
     assert!(KEY_ID_SIZE == 16);
     assert!(SIGNATURE_SIZE == 64);

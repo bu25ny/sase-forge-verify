@@ -309,7 +309,8 @@ impl LicensePolicy {
         // Check if features are compatible with tier
         let tier_features = self.tier.default_features();
         if !self.features.is_subset_of(tier_features) {
-            if self.tier != LicenseTier::Government {
+            // Use .value() comparison — const-compatible since LicenseTier is #[repr(u8)]
+            if self.tier.value() != LicenseTier::Government.value() {
                 return Err(PolicyError::FeatureTierMismatch);
             }
         }
