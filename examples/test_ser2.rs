@@ -1,5 +1,5 @@
-use sase_license_core::policy::LicensePolicy;
-use sase_license_core::tier::LicenseTier;
+use sase_forge_verify::policy::LicensePolicy;
+use sase_forge_verify::tier::LicenseTier;
 
 fn main() {
     let policy = LicensePolicy::new(LicenseTier::Pro)
