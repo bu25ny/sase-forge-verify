@@ -2,7 +2,7 @@
 name = "sase-forge-verify"
 version = "0.1.0"
 edition = "2021"
-authors = ["SASE Antigravity Team <licensing@sase-antigravity.dev>"]
+authors = ["SASE Forge Team <licensing@sase-forge.dev>"]
 description = "Sovereign licensing verification runtime. Zero-heap, no_std, TPM2, Merkle-DAG audit, WASM & Python ready."
 license = "MIT OR Apache-2.0"
 readme = "README.md"
