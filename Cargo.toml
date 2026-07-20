@@ -1,11 +1,11 @@
 [package]
-name = "sase-license-core"
+name = "sase-forge-verify"
 version = "0.1.0"
 edition = "2021"
-description = "SASE licensing engine - no_std, WASM compatible, zero-heap hot paths"
+description = "SASE Forge Verify - Sovereign licensing verification runtime. Zero-heap, no_std, TPM2, Merkle-DAG, WASM, Python."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/sase-license/sase-license-core"
-keywords = ["sase", "license", "licensing", "ed25519", "tpm", "merkle", "no_std", "wasm"]
+repository = "https://github.com/bu25ny/sase-forge-verify"
+keywords = ["sase", "license", "licensing", "ed25519", "tpm", "merkle", "no_std", "wasm", "verify", "forge"]
 categories = ["cryptography", "security", "wasm", "no-std", "embedded"]
 
 [package.metadata.docs.rs]
