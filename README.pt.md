@@ -11,6 +11,10 @@
 [![Zero-Heap](https://img.shields.io/badge/zero--heap-compliant-brightgreen.svg)](#zero-heap-compliance)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](#python-bindings)
 
+<p align="center">
+  <strong>⚡ 200+ comandos shell autônomos · 75/75 tests passing · 9 idiomas · Construído na Costa Rica 🇨🇷</strong>
+</p>
+
 ---
 
 ## 🌐 Languages / Idiomas / Langues / 语言 / 語言 / языки
@@ -61,6 +65,10 @@ verify_license(license_bytes, &policy, timestamp)?
 - ✅ **Selagem (Sealing) PCR TPM2** — detecta bootkits/rootkits
 - ✅ **Registro de auditoria Merkle-DAG** — trilhas de conformidade forense
 - ✅ **Caminhos críticos zero-heap (hot paths)** — roda em kernels, SGX, WASM, bootloaders
+
+<p align="center">
+  <img src="docs/img/architecture.svg" alt="SASE Forge Verify — Architecture Flow" width="700"/>
+</p>
 
 ---
 
@@ -258,6 +266,13 @@ Sua chave de assinatura offline nunca toca o crate. O invasor obtém um verifica
 > - **Auditoria Merkle** (eles registram em arquivos de texto)
 > - **Pronto para WASM/kernel** (eles não estão)
 
+<p align="center">
+  <img src="docs/img/tier_matrix.svg" alt="Feature Matrix by Tier" width="800"/>
+</p>
+<p align="center">
+  <img src="docs/img/vs_competitors.svg" alt="SASE Forge vs Competitors" width="800"/>
+</p>
+
 ---
 
 ## 💻 Requisitos Mínimos de Hardware
@@ -291,6 +306,10 @@ $ cargo build --release --target wasm32-unknown-unknown --features wasm,crypto
 $ ls -lh target/wasm32-unknown-unknown/release/sase_forge_verify.wasm
    184K  # ~184 KB compactado para ~45 KB
 ```
+
+<p align="center">
+  <img src="docs/img/footprint.svg" alt="Binary Footprint Comparison" width="700"/>
+</p>
 
 ---
 

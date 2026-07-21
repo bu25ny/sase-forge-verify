@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="350" viewBox="0 0 700 350">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .bar-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; rx: 4; ry: 4; }
+      .bar-no_std { fill: #3fb950; rx: 4; ry: 4; }
+      .bar-std { fill: #58a6ff; rx: 4; ry: 4; }
+      .bar-wasm { fill: #39c5cf; rx: 4; ry: 4; }
+      .bar-python { fill: #d29922; rx: 4; ry: 4; }
+      .text-title { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; font-weight: 700; text-anchor: middle; }
+      .text-label { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; text-anchor: end; dominant-baseline: middle; }
+      .text-value { fill: #e6edf3; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 11px; font-weight: 600; text-anchor: start; dominant-baseline: middle; }
+      .text-sub { fill: #8b949e; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10px; text-anchor: start; dominant-baseline: middle; }
+      .legend-text { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      .axis { stroke: #30363d; stroke-width: 1; }
+      .grid { stroke: #21262d; stroke-width: 0.5; }
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #ffffff; }
+        .bar-bg { fill: #f6f8fa; stroke: #d0d7de; }
+        .text-title { fill: #24292f; }
+        .text-label, .text-value { fill: #24292f; }
+        .text-sub { fill: #656d76; }
+        .legend-text { fill: #24292f; }
+        .axis { stroke: #d0d7de; }
+        .grid { stroke: #e1e4e8; }
+      }
+    </style>
+  </defs>
+  
+  <rect class="bg" width="700" height="350"/>
+  
+  <!-- Title -->
+  <text x="350" y="30" class="text-title">Binary Footprint Comparison</text>
+  
+  <!-- Chart area: x=150 to 650, y=60 to 300 -->
+  <!-- Y-axis labels -->
+  <text x="140" y="80" class="text-label">no_std verify</text>
+  <text x="140" y="140" class="text-label">std verify</text>
+  <text x="140" y="200" class="text-label">WASM browser</text>
+  <text x="140" y="260" class="text-label">Python binding</text>
+  
+  <!-- Grid lines -->
+  <line x1="150" y1="70" x2="650" y2="70" class="grid"/>
+  <line x1="150" y1="130" x2="650" y2="130" class="grid"/>
+  <line x1="150" y1="190" x2="650" y2="190" class="grid"/>
+  <line x1="150" y1="250" x2="650" y2="250" class="grid"/>
+  
+  <!-- Bar backgrounds -->
+  <rect x="150" y="65" width="500" height="35" class="bar-bg"/>
+  <rect x="150" y="125" width="500" height="35" class="bar-bg"/>
+  <rect x="150" y="185" width="500" height="35" class="bar-bg"/>
+  <rect x="150" y="245" width="500" height="35" class="bar-bg"/>
+  
+  <!-- Bars (scaled to 500px max = 5000KB) -->
+  <!-- no_std: 4 KB = 0.4px -> min 20px -->
+  <rect x="150" y="68" width="20" height="29" class="bar-no_std"/>
+  <text x="175" y="82" class="text-value">4 KB</text>
+  <text x="175" y="92" class="text-sub">ARM Cortex-M4 • 512B RAM</text>
+  
+  <!-- std: 162 KB = 16.2px -> ~16px, min 20px for visibility -->
+  <rect x="150" y="128" width="20" height="29" class="bar-std"/>
+  <text x="175" y="142" class="text-value">162 KB</text>
+  <text x="175" y="152" class="text-sub">x86_64 Linux • ~162 KB binary</text>
+  
+  <!-- WASM: 184 KB -->
+  <rect x="150" y="188" width="20" height="29" class="bar-wasm"/>
+  <text x="175" y="202" class="text-value">184 KB</text>
+  <text x="175" y="212" class="text-sub">wasm32-unknown-unknown • ~45 KB gzipped</text>
+  
+  <!-- Python: 5000 KB -->
+  <rect x="150" y="248" width="500" height="29" class="bar-python"/>
+  <text x="660" y="262" class="text-value">5,000 KB</text>
+  <text x="660" y="272" class="text-sub">PyO3 overhead • .so/.pyd files</text>
+  
+  <!-- Legend -->
+  <g transform="translate(150, 310)">
+    <rect x="0" y="0" width="16" height="16" class="bar-no_std"/>
+    <text x="20" y="12" class="legend-text">no_std verify (4 KB)</text>
+    <rect x="180" y="0" width="16" height="16" class="bar-std"/>
+    <text x="200" y="12" class="legend-text">std verify (162 KB)</text>
+    <rect x="360" y="0" width="16" height="16" class="bar-wasm"/>
+    <text x="380" y="12" class="legend-text">WASM (184 KB)</text>
+    <rect x="520" y="0" width="16" height="16" class="bar-python"/>
+    <text x="540" y="12" class="legend-text">Python bindings (5 MB)</text>
+  </g>
+  
+  <!-- Note -->
+  <text x="350" y="335" class="text-sub" style="font-size: 10px;">All sizes from cargo build --release. no_std target: thumbv7em-none-eabihf. WASM: wasm32-unknown-unknown.</text>
+</svg>

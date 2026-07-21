@@ -266,6 +266,13 @@ Your offline signing key never touches the crate. The attacker gets a verifier, 
 > - **Merkle audit** (they log to text files)
 > - **WASM/kernel ready** (they aren't)
 
+<p align="center">
+  <img src="docs/img/tier_matrix.svg" alt="Feature Matrix by Tier" width="800"/>
+</p>
+<p align="center">
+  <img src="docs/img/vs_competitors.svg" alt="SASE Forge vs Competitors" width="800"/>
+</p>
+
 ---
 
 ## 💻 Minimum Hardware Requirements
@@ -299,6 +306,10 @@ $ cargo build --release --target wasm32-unknown-unknown --features wasm,crypto
 $ ls -lh target/wasm32-unknown-unknown/release/sase_forge_verify.wasm
    184K  # ~184 KB gzipped to ~45 KB
 ```
+
+<p align="center">
+  <img src="docs/img/footprint.svg" alt="Binary Footprint Comparison" width="700"/>
+</p>
 
 ---
 

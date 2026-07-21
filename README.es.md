@@ -266,6 +266,13 @@ Tu clave de firma offline nunca toca el crate. El atacante obtiene un verificado
 > - **Auditoría Merkle** (ellos loguean a archivos de texto)
 > - **WASM/kernel ready** (ellos no)
 
+<p align="center">
+  <img src="docs/img/tier_matrix.svg" alt="Feature Matrix by Tier" width="800"/>
+</p>
+<p align="center">
+  <img src="docs/img/vs_competitors.svg" alt="SASE Forge vs Competitors" width="800"/>
+</p>
+
 ---
 
 ## 💻 Requisitos Mínimos de Hardware
@@ -299,6 +306,10 @@ $ cargo build --release --target wasm32-unknown-unknown --features wasm,crypto
 $ ls -lh target/wasm32-unknown-unknown/release/sase_forge_verify.wasm
    184K  # ~184 KB gzipped a ~45 KB
 ```
+
+<p align="center">
+  <img src="docs/img/footprint.svg" alt="Binary Footprint Comparison" width="700"/>
+</p>
 
 ---
 

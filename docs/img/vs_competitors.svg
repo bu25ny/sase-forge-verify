@@ -1,0 +1,239 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .header-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .cell-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .cell-sase { fill: #0d2818; stroke: #30363d; stroke-width: 1; }
+      .text-header { fill: #58a6ff; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; font-weight: 700; text-anchor: middle; }
+      .text-feature { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; text-anchor: start; dominant-baseline: middle; }
+      .text-competitor { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600; text-anchor: middle; }
+      .text-sase { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; text-anchor: middle; }
+      .text-yes { fill: #3fb950; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 18px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .text-no { fill: #484f58; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 18px; font-weight: 400; text-anchor: middle; dominant-baseline: middle; }
+      .text-title { fill: #58a6ff; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; font-weight: 700; text-anchor: middle; }
+      .text-sub { fill: #8b949e; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; text-anchor: middle; }
+      .legend-text { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      .check { fill: #3fb950; }
+      .cross { fill: #484f58; }
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #ffffff; }
+        .header-bg, .cell-bg { fill: #f6f8fa; stroke: #d0d7de; }
+        .cell-sase { fill: #dafbe1; stroke: #d0d7de; }
+        .text-header { fill: #0969da; }
+        .text-feature, .text-competitor, .text-sase { fill: #24292f; }
+        .text-yes { fill: #1a7f37; }
+        .text-no { fill: #969696; }
+        .text-title { fill: #0969da; }
+        .text-sub { fill: #656d76; }
+        .legend-text { fill: #24292f; }
+        .check { fill: #1a7f37; }
+        .cross { fill: #969696; }
+      }
+    </style>
+  </defs>
+  
+  <rect class="bg" width="800" height="400"/>
+  
+  <!-- Title -->
+  <text x="400" y="28" class="text-title">SASE Forge Verify vs Competitors</text>
+  <text x="400" y="48" class="text-sub">✅ = Included in tier  |  ❌ = Not available / requires upgrade</text>
+  
+  <!-- Table Layout -->
+  <!-- Columns: Feature(180), SASE Forge(100), Mythos(100), Replicated(100), Keygen(100), LicenseSpring(100) = 680 total, centered at 60 -->
+  <g transform="translate(60, 70)">
+    <!-- Column widths -->
+    <!-- Header row -->
+    <rect x="0" y="0" width="180" height="40" class="header-bg"/>
+    <text x="90" y="25" class="text-header">Feature</text>
+    
+    <rect x="180" y="0" width="100" height="40" class="header-bg"/>
+    <text x="230" y="25" class="text-header" style="fill: #3fb950;">SASE Forge</text>
+    
+    <rect x="280" y="0" width="100" height="40" class="header-bg"/>
+    <text x="330" y="25" class="text-header">Mythos</text>
+    
+    <rect x="380" y="0" width="100" height="40" class="header-bg"/>
+    <text x="430" y="25" class="text-header">Replicated</text>
+    
+    <rect x="480" y="0" width="100" height="40" class="header-bg"/>
+    <text x="530" y="25" class="text-header">Keygen</text>
+    
+    <rect x="580" y="0" width="100" height="40" class="header-bg"/>
+    <text x="630" y="25" class="text-header">LicenseSpring</text>
+    
+    <!-- Row 1: Zero-heap -->
+    <rect x="0" y="40" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="60" class="text-feature">Zero-heap</text>
+    
+    <rect x="180" y="40" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="60" class="text-yes check">✅</text>
+    
+    <rect x="280" y="40" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="60" class="text-no cross">❌</text>
+    
+    <rect x="380" y="40" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="60" class="text-no cross">❌</text>
+    
+    <rect x="480" y="40" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="60" class="text-no cross">❌</text>
+    
+    <rect x="580" y="40" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="60" class="text-no cross">❌</text>
+    
+    <!-- Row 2: no_std -->
+    <rect x="0" y="80" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="100" class="text-feature">no_std</text>
+    
+    <rect x="180" y="80" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="100" class="text-yes check">✅</text>
+    
+    <rect x="280" y="80" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="100" class="text-no cross">❌</text>
+    
+    <rect x="380" y="80" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="100" class="text-no cross">❌</text>
+    
+    <rect x="480" y="80" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="100" class="text-no cross">❌</text>
+    
+    <rect x="580" y="80" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="100" class="text-no cross">❌</text>
+    
+    <!-- Row 3: TPM2 native -->
+    <rect x="0" y="120" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="140" class="text-feature">TPM2 native</text>
+    
+    <rect x="180" y="120" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="140" class="text-yes check">✅</text>
+    
+    <rect x="280" y="120" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="140" class="text-no cross">❌</text>
+    
+    <rect x="380" y="120" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="140" class="text-no cross">❌</text>
+    
+    <rect x="480" y="120" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="140" class="text-no cross">❌</text>
+    
+    <rect x="580" y="120" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="140" class="text-no cross">❌</text>
+    
+    <!-- Row 4: Merkle audit -->
+    <rect x="0" y="160" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="180" class="text-feature">Merkle audit</text>
+    
+    <rect x="180" y="160" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="180" class="text-yes check">✅</text>
+    
+    <rect x="280" y="160" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="180" class="text-no cross">❌</text>
+    
+    <rect x="380" y="160" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="180" class="text-no cross">❌</text>
+    
+    <rect x="480" y="160" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="180" class="text-no cross">❌</text>
+    
+    <rect x="580" y="160" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="180" class="text-no cross">❌</text>
+    
+    <!-- Row 5: WASM ready -->
+    <rect x="0" y="200" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="220" class="text-feature">WASM ready</text>
+    
+    <rect x="180" y="200" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="220" class="text-yes check">✅</text>
+    
+    <rect x="280" y="200" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="220" class="text-no cross">❌</text>
+    
+    <rect x="380" y="200" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="220" class="text-no cross">❌</text>
+    
+    <rect x="480" y="200" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="220" class="text-no cross">❌</text>
+    
+    <rect x="580" y="200" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="220" class="text-no cross">❌</text>
+    
+    <!-- Row 6: Free OSS -->
+    <rect x="0" y="240" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="260" class="text-feature">Free OSS tier</text>
+    
+    <rect x="180" y="240" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="260" class="text-yes check">✅</text>
+    
+    <rect x="280" y="240" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="260" class="text-no cross">❌</text>
+    
+    <rect x="380" y="240" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="260" class="text-no cross">❌</text>
+    
+    <rect x="480" y="240" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="260" class="text-no cross">Partial</text>
+    
+    <rect x="580" y="240" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="260" class="text-no cross">❌</text>
+    
+    <!-- Row 7: Ed25519 verify -->
+    <rect x="0" y="280" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="300" class="text-feature">Ed25519 verify</text>
+    
+    <rect x="180" y="280" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="300" class="text-yes check">✅</text>
+    
+    <rect x="280" y="280" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="300" class="text-yes check">✅</text>
+    
+    <rect x="380" y="280" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="300" class="text-yes check">✅</text>
+    
+    <rect x="480" y="280" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="300" class="text-yes check">✅</text>
+    
+    <rect x="580" y="280" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="300" class="text-yes check">✅</text>
+    
+    <!-- Row 8: HW binding -->
+    <rect x="0" y="320" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="340" class="text-feature">HW binding</text>
+    
+    <rect x="180" y="320" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="340" class="text-yes check">✅</text>
+    
+    <rect x="280" y="320" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="340" class="text-no cross">❌</text>
+    
+    <rect x="380" y="320" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="340" class="text-no cross">❌</text>
+    
+    <rect x="480" y="320" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="340" class="text-yes check">✅</text>
+    
+    <rect x="580" y="320" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="340" class="text-yes check">✅</text>
+    
+    <!-- Row 9: Formal verify -->
+    <rect x="0" y="360" width="180" height="40" class="cell-bg"/>
+    <text x="10" y="380" class="text-feature">Formal verify</text>
+    
+    <rect x="180" y="360" width="100" height="40" class="cell-sase"/>
+    <text x="230" y="380" class="text-no cross">❌</text>
+    
+    <rect x="280" y="360" width="100" height="40" class="cell-bg"/>
+    <text x="330" y="380" class="text-no cross">❌</text>
+    
+    <rect x="380" y="360" width="100" height="40" class="cell-bg"/>
+    <text x="430" y="380" class="text-no cross">❌</text>
+    
+    <rect x="480" y="360" width="100" height="40" class="cell-bg"/>
+    <text x="530" y="380" class="text-no cross">❌</text>
+    
+    <rect x="580" y="360" width="100" height="40" class="cell-bg"/>
+    <text x="630" y="380" class="text-no cross">❌</text>
+  </g>
+  
+  <!-- Legend at bottom -->
+  <text x="400" y="395" class="text-sub" style="font-size: 10px;">SASE Forge Verify: Community (Free) · Scientific (Paid - ML policies, anomaly detection, HSM) · Government (Paid - Formal verification, classified HSM)</text>
+</svg>

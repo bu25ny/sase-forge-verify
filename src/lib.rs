@@ -1,6 +1,16 @@
-#![doc = include_str!("../README.md")]
-
+//! SASE Forge Verify — Zero-heap, no_std license verification runtime.
+//! 
+//! # Features
+//! - `crypto` — Ed25519 verification (required)
+//! - `std` — Standard library support  
+//! - `python` — PyO3 bindings
+//! - `tpm` — TPM2 via TSS-ESAPI
+//! - `sqlite` — Merkle-DAG audit log
+//! - `wasm` — WASM target support
+//! - `alloc` — no_std + alloc
+//! - `zeroize` — Secret zeroization
 #![no_std]
+
 // Note: feature(const_fn) was removed in Rust 1.54 (split into finer-grained gates)
 #![cfg_attr(all(not(feature = "std"), not(test)), no_main)]
 #![deny(
@@ -25,7 +35,7 @@ pub use tier::{LicenseTier, TierError};
 pub use features::{FeatureSet, Feature, FeatureError};
 pub use policy::{LicensePolicy, PolicyError};
 pub use crypto::{Ed25519Verifier, VerifyError, Signature, PublicKey, SecretKey, KeyId};
-pub use key::{LicenseKey, KeyError};
+pub use key::{LicenseKey, KeyError, verify_license, verify_license_inline};
 pub use tpm::{TpmSealer, TpmError, MockTpmSealer, PcrMask, PcrIndices};
 pub use merkle::{MerkleNode, MerkleLog, MerkleProof, MerkleError};
 
