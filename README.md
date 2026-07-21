@@ -11,6 +11,10 @@
 [![Zero-Heap](https://img.shields.io/badge/zero--heap-compliant-brightgreen.svg)](#zero-heap-compliance)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](#python-bindings)
 
+<p align="center">
+  <strong>⚡ 200+ autonomous shell commands · 75/75 tests passing · 9 languages · Built in Costa Rica 🇨🇷</strong>
+</p>
+
 ---
 
 ## 🌐 Languages / Idiomas / Langues / 语言 / 語言 / языки
@@ -61,6 +65,10 @@ verify_license(license_bytes, &policy, timestamp)?
 - ✅ **TPM2 PCR sealing** — detects bootkits/rootkits
 - ✅ **Merkle-DAG audit log** — forensic compliance trails
 - ✅ **Zero-heap hot paths** — runs in kernels, SGX, WASM, bootloaders
+
+<p align="center">
+  <img src="docs/img/architecture.svg" alt="SASE Forge Verify — Architecture Flow" width="700"/>
+</p>
 
 ---
 

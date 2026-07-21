@@ -1,15 +1,19 @@
 # SASE Forge Verify
 
-> **Verifica licencias en microsegundos. Vincula al hardware. Lanza con confianza.**
+> **Verifica licencias en microsegundos. Enlaza al hardware. Lanza con confianza.**
 > 
-> El entorno de ejecución de verificación para software soberano. Zero-heap. No_std. Listo para producción.
+> El runtime de verificación para software soberano. Zero-heap. No_std. Listo para producción.
 
 [![Crates.io](https://img.shields.io/crates/v/sase-forge-verify.svg)](https://crates.io/crates/sase-forge-verify)
-[![Documentation](https://docs.rs/sase-forge-verify/badge.svg)](https://docs.rs/sase-forge-verify)
-[![License](https://img.shields.io/crates/l/sase-forge-verify.svg)](LICENSE)
-[![Rust Version](https://img.shields.io/badge/rust-1.75%2B-blue.svg)](https://blog.rust-lang.org/2023/12/21/Rust-1.75.0.html)
+[![Documentación](https://docs.rs/sase-forge-verify/badge.svg)](https://docs.rs/sase-forge-verify)
+[![Licencia](https://img.shields.io/crates/l/sase-forge-verify.svg)](LICENSE)
+[![Versión Rust](https://img.shields.io/badge/rust-1.75%2B-blue.svg)](https://blog.rust-lang.org/2023/12/21/Rust-1.75.0.html)
 [![Zero-Heap](https://img.shields.io/badge/zero--heap-compliant-brightgreen.svg)](#zero-heap-compliance)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](#python-bindings)
+
+<p align="center">
+  <strong>⚡ 200+ comandos shell autónomos · 75/75 tests passing · 9 idiomas · Construido en Costa Rica 🇨🇷</strong>
+</p>
 
 ---
 
@@ -32,15 +36,15 @@
 
 ## 🎯 El Problema que Tienes
 
-| Si estás construyendo... | Estás atrapado con... |
-|----------------------|---------------------|
-| SaaS / CLI / SDK comercial | Crear tus propios controles de licencia (con errores, evasibles) |
-| Software empresarial | "Necesitamos vinculación de hardware TPM2" — requisito del cliente |
-| Implementaciones soberanas/aisladas (air-gapped) | No se permiten servidores de licencias en la nube |
-| WASM / embebido / módulos de kernel | Sin montículo (heap), sin std, no hay problema — hasta que necesitas criptografía |
-| Equipos políglotas en Python/Rust/Go | Lógica de licencias diferente en cada lenguaje |
+| Si estás construyendo... | Te quedas atascado con... |
+|--------------------------|--------------------------|
+| SaaS comercial / CLI / SDK | Controles de licencia propios (buggy, fáciles de saltar) |
+| Software empresarial | "Necesitamos binding TPM2 en hardware" — requisito del cliente |
+| Despliegues soberanos/air-gapped | Servidores de licencia en la nube no permitidos |
+| WASM / embebido / módulos kernel | Sin heap, sin std, sin problema — hasta que necesitas crypto |
+| Equipos políglotas (Python/Rust/Go) | Lógica de licencia diferente en cada lenguaje |
 
-**No quieres una biblioteca de licencias. Quieres que las licencias *no sean tu problema*.**
+**No quieres una librería de licencias. Quieres que las licencias *dejen de ser tu problema*.**
 
 ---
 
@@ -49,18 +53,22 @@
 Una **única función de verificación** que lo hace todo:
 
 ```rust
-// Una llamada. Cero montículo (Zero heap). Tiempo constante. No_std.
+// Una llamada. Zero heap. Tiempo constante. No_std.
 verify_license(license_bytes, &policy, timestamp)?
 ```
 
 **Lo que maneja por ti:**
-- ✅ **Firmas Ed25519** — imposibles de falsificar sin clave privada
-- ✅ **Vinculación de hardware** — ID de CPU, PCRs de TPM2, huellas personalizadas
-- ✅ **Características por niveles** — 6 niveles × 64 características (Gratis → Gobierno)
-- ✅ **Validez limitada en el tiempo** — tiempo constante, sin ataques de reloj
-- ✅ **Sellado de PCR TPM2** — detecta bootkits/rootkits
-- ✅ **Registro de auditoría Merkle-DAG** — rastros de cumplimiento forense
-- ✅ **Rutas críticas sin montículo (zero-heap hot paths)** — se ejecuta en kernels, SGX, WASM, gestores de arranque
+- ✅ **Firmas Ed25519** — imposibles de forjar sin la clave privada
+- ✅ **Binding de hardware** — CPU ID, TPM2 PCRs, huellas digitales personalizadas
+- ✅ **Features por tier** — 6 tiers × 64 features (Free → Government)
+- ✅ **Validez temporal** — tiempo constante, inmune a ataques de reloj
+- ✅ **Sellado TPM2 PCR** — detecta bootkits/rootkits
+- ✅ **Log de auditoría Merkle-DAG** — trazabilidad forense
+- ✅ **Hot paths zero-heap** — corre en kernels, SGX, WASM, bootloaders
+
+<p align="center">
+  <img src="docs/img/architecture.svg" alt="SASE Forge Verify — Architecture Flow" width="700"/>
+</p>
 
 ---
 
@@ -78,7 +86,7 @@ sase-forge-verify = { version = "0.1", features = ["crypto"] }  # ¡mínimo!
 use sase_forge_verify::{LicenseTier, FeatureSet, LicensePolicy, verify_license};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Tu política esperada (incrustar en el binario)
+    // Tu política esperada (compilada en el binario)
     let policy = LicensePolicy::builder(LicenseTier::Pro)
         .max_tokens(50_000_000)
         .add_feature(FeatureSet::WafProtection)
@@ -111,7 +119,7 @@ policy = LicensePolicy(
 )
 
 verify_license(open("license.key","rb").read(), policy, int(time.time()))
-print("✅ Licensed")
+print("✅ Licenciado")
 ```
 
 ### WASM (Navegador / Edge)
@@ -122,7 +130,7 @@ sase-forge-verify = { version = "0.1", features = ["wasm", "crypto"] }
 ```
 
 ```rust
-// Se compila a WASM de ~200KB, se ejecuta en trabajadores de navegador/edge
+// Compila a ~200KB WASM, corre en browser/edge workers
 use sase_forge_verify::verify_license;
 ```
 
@@ -130,166 +138,166 @@ use sase_forge_verify::verify_license;
 
 ## 🏭 Casos de Uso Reales
 
-### 1. **Proveedor de SaaS: "Detener la Fuga de Ingresos"**
-> **Problema:** Los clientes comparten claves de licencia, exceden las cuotas, se ejecutan en servidores no autorizados.
+### 1. **Vendor SaaS: "Frena la Fuga de Ingresos"**
+> **Problema:** Clientes comparten claves de licencia, exceden cuotas, corren en servidores no autorizados.
 > 
-> **Solución:** Incrustar la política en el binario. La licencia se vincula a los PCR de TPM2 + huella de la CPU. 
-> La verificación se ejecuta en <500ns — cero sobrecarga en la ruta crítica.
+> **Solución:** Política embebida en binario. Licencia enlaza TPM2 PCRs + huella CPU. 
+> Verificación en <500ns — overhead cero en hot path.
 > 
-> **Resultado:** Cero claves compartidas en 18 meses. Recuperación del 40% de ingresos mediante el cumplimiento de cuotas.
+> **Resultado:** Cero claves compartidas en 18 meses. 40% recuperación de ingresos por enforcement de cuotas.
 
 ```rust
-// Política compilada en tu binario — el cliente no puede cambiarla
+// Política compilada en TU binario — el cliente no la puede cambiar
 const POLICY: LicensePolicy = LicensePolicy::builder(LicenseTier::Pro)
     .max_requests(1_000_000)
     .hw_bound(true)           // Requiere hardware coincidente
-    .tpm_required(true)       // Requiere coincidencia de PCR de TPM2
+    .tpm_required(true)       // Requiere match TPM2 PCR
     .build();
 ```
 
-### 2. **Embebido/IoT: "Firmware que solo se ejecuta en nuestros dispositivos"**
-> **Problema:** Los competidores instalan tu firmware en hardware clonado. Sin conectividad a la nube para controles de licencia.
+### 2. **Embedded/IoT: "Firmware que SOLO corre en Nuestros Dispositivos"**
+> **Problema:** Competidores flashean tu firmware en hardware clonado. Sin conectividad cloud para checks.
 > 
-> **Solución:** Verificación `no_std` + `zero-heap` se ejecuta en el gestor de arranque. 
-> Se vincula al ID de CPU único del dispositivo + TPM PCR 0 (integridad de arranque).
+> **Solución:** `no_std` + `zero-heap` verification corre en bootloader. 
+> Enlaza a CPU ID único del dispositivo + TPM PCR 0 (integridad boot).
 > 
-> **Resultado:** Los dispositivos clonados se bloquean (brick) al arrancar. Costo de ejecución nulo (~2KB flash).
+> **Resultado:** Dispositivos clonados brickean en boot. Costo runtime cero (~2KB flash).
 
 ```rust
-// Verificación en el gestor de arranque — sin montículo, sin std, tiempo constante
+// Verificación en bootloader — sin heap, sin std, tiempo constante
 #[inline(always)]
 fn verify_firmware_license(key: &[u8]) -> Result<(), VerifyError> {
     verify_license(key, &BOOT_POLICY, hw_timestamp())  // ~200 ciclos
 }
 ```
 
-### 3. **Gobierno/Defensa: "Cumplimiento Aislado (Air-Gapped)"**
-> **Problema:** Las redes clasificadas prohíben las conexiones salientes. Se necesita un rastro de auditoría a prueba de manipulaciones.
+### 3. **Gobierno/Defensa: "Compliance Air-Gapped"**
+> **Problema:** Redes clasificadas prohíben conexiones salientes. Necesitan rastro de auditoría inmutable.
 > 
-> **Solución:** Registro Merkle-DAG sellado a PCRs de TPM. Cada control de licencia añade 
-> una prueba criptográfica. Verificable sin conexión con `merkle_log.verify_integrity()`.
+> **Solución:** Log Merkle-DAG sellado a TPM PCRs. Cada check de licencia añade 
+> prueba criptográfica. Verificable offline con `merkle_log.verify_integrity()`.
 > 
 > **Resultado:** Pasa NSA/DoD RMF. Cero dependencias externas.
 
 ```rust
-// Registro de auditoría aislado — solo anexión, a prueba de manipulaciones
+// Log de auditoría air-gapped — append-only, tamper-evident
 let mut log = MerkleLog::new_file("audit.db")?;
-log.append_verify_event(&event)?;      // Cada comprobación se registra
-let anchor = log.create_anchor()?;     // Punto de control periódico
+log.append_verify_event(&event)?;      // Cada check se loguea
+let anchor = log.create_anchor()?;     // Checkpoint periódico
 log.verify_integrity()?;               // Prueba que no hubo manipulación
 ```
 
-### 4. **Equipo Políglota: "Una Única Lógica de Licencias en Todas Partes"**
-> **Problema:** Backend en Rust, servicio ML en Python, CLI en Go, frontend WASM — todos necesitan la misma lógica de licencias.
+### 4. **Equipo Políglota: "Una Lógica de Licencia en Todos Lados"**
+> **Problema:** Backend Rust, servicio ML Python, CLI Go, frontend WASM — todos necesitan misma lógica.
 > 
-> **Solución:** El núcleo es Rust `no_std`. Vinculaciones para Python vía PyO3. WASM vía wasm-bindgen. 
-> Encabezado C FFI para Go/C++/Node. Única fuente de verdad.
+> **Solución:** Core es Rust `no_std`. Bindings Python vía PyO3. WASM vía wasm-bindgen. 
+> Header C FFI para Go/C++/Node. Única fuente de verdad.
 > 
-> **Resultado:** Cumplimiento 100% consistente. Cero desviaciones.
+> **Resultado:** 100% enforcement consistente. Cero drift.
 
 ```python
-# Servicio ML en Python
+# Servicio ML Python
 from sase_forge_verify import verify_license, LicenseTier, FeatureFlags, FeaturePy
 
-# CLI en Go (vía C FFI)
+# CLI Go (vía C FFI)
 // #include "sase_forge_verify.h"
 // verify_license(key, policy, timestamp)
 ```
 
-### 5. **Prueba Empresarial: "Limitada en Tiempo, con Funciones Restringidas, Inamovible"**
-> **Problema:** Las versiones de prueba se crackean. Las banderas de características en los archivos de configuración se editan.
+### 5. **Trial Enterprise: "Time-Limited, Feature-Gated, Ineliminable"**
+> **Problema:** Trials se crackean. Feature flags en config se editan.
 > 
-> **Solución:** Licencia de prueba = política firmada con `valid_until` + máscara de bits de características. 
-> Verificada en la ruta crítica. No se puede extender sin la clave privada. No se pueden habilitar características 
-> sin volver a firmar.
+> **Solución:** Licencia trial = política firmada con `valid_until` + bitmask de features. 
+> Verificada en hot path. No se puede extender sin clave privada. No se pueden habilitar features 
+> sin re-firmar.
 > 
-> **Resultado:** La conversión de pruebas aumenta un 35%. Cero pruebas crackeadas en uso real.
+> **Resultado:** Conversión trial ↑ 35%. Cero trials crackeados en la naturaleza.
 
 ```rust
-// Política de prueba — firmada por TU clave fuera de línea (offline)
+// Política trial — firmada por TU clave offline
 let trial_policy = LicensePolicy::builder(LicenseTier::Free)
     .max_tokens(10_000)
     .max_requests(1_000)
-    .add_feature(FeatureSet::BasicAuth)       // Solo funciones básicas
-    .valid_until(trial_expiry_timestamp)      // Expiración estricta
+    .add_feature(FeatureSet::BasicAuth)       // Solo features básicas
+    .valid_until(trial_expiry_timestamp)      // Expiración dura
     .build();
 ```
 
 ---
 
-## 🛡️ Nivel Gratuito: Uso Malicioso Imposible por Diseño
+## 🛡️ Free Tier: Uso Malicioso Imposible por Diseño
 
-La **Community Edition (MIT/Apache-2.0)** es **arquitectónicamente incapaz** de permitir el uso malicioso:
+La **Community Edition (MIT/Apache-2.0)** es **arquitectónicamente incapaz** de permitir uso malicioso:
 
 | Objetivo Malicioso | Por Qué Falla |
-|----------------|--------------|
-| **Falsificar licencias** | Requiere clave privada Ed25519 (tú la tienes, nunca en el crate) |
-| **Eludir vinculación de hardware** | Valores PCR de TPM2 sellados al arrancar — no se pueden falsificar sin acceso físico |
-| **Extender expiración** | Marca de tiempo firmada en la licencia — modificarla rompe la firma |
-| **Habilitar funciones bloqueadas** | Máscara de bits de características firmada — cambiar bits invalida la firma |
-| **Ataques de repetición (Replay)** | Nonce + marca de tiempo en la política — detección de repetición en tiempo constante |
-| **Eliminar verificación** | La verificación ES tu ruta crítica — eliminarla rompe tu aplicación |
-| **Distribuir binario crackeado** | Cada licencia se vincula a una huella de HW única — inútil en otras máquinas |
+|-------------------|---------------|
+| **Forjar licencias** | Requiere clave privada Ed25519 (tú la tienes, nunca en el crate) |
+| **Saltarse HW binding** | TPM2 PCRs sellados en boot — no se puede spoofear sin acceso físico |
+| **Extender expiración** | Timestamp firmado en licencia — modificarlo rompe la firma |
+| **Habilitar features bloqueadas** | Bitmask de features firmado — flippear bits invalida la firma |
+| **Ataques de replay** | Nonce + timestamp en política — detección replay tiempo constante |
+| **Quitar verificación** | La verificación ES tu hot path — quitarla rompe tu app |
+| **Distribuir binario crackeado** | Cada licencia enlaza a huella HW única — inútil en otras máquinas |
 
-**El crate SOLAMENTE verifica. No puede generar, firmar ni modificar licencias.**  
-Tu clave de firma offline nunca toca el crate. El atacante obtiene un verificador, no un falsificador.
+**El crate SOLO verifica. No puede generar, firmar, ni modificar licencias.**  
+Tu clave de firma offline nunca toca el crate. El atacante obtiene un verificador, no un forjador.
 
 ---
 
-## 💰 Niveles de Pago: Compitiendo con Mythos y Más Allá
+## 💰 Tiers Pagos: Compitiendo con Mythos y Más Allá
 
-| Capacidad | Community (Gratis) | Scientific (Pago) | Government (Pago) |
-|------------|------------------|-------------------|-------------------|
-| **Entorno de verificación** | ✅ Completo | ✅ Completo | ✅ Completo |
-| **Síntesis de política (TERNAL)** | ❌ | ✅ Políticas óptimas generadas por ML | ✅ Políticas para flujos clasificados |
-| **Detección de anomalías** | ❌ | ✅ Análisis de comportamiento con ML | ✅ Correlación de amenazas en tiempo real |
-| **Automatización de cumplimiento** | ❌ | ✅ Informes SOC2/ISO/FedRAMP | ✅ Auto-evidencia STIG/CMMC |
-| **Integración HSM** | ❌ Claves por software | ✅ PKCS#11 / HSM en la Nube | ✅ HSM Clasificado / Aislado |
-| **Verificación formal** | ❌ | ✅ Pruebas Coq/Lean disponibles | ✅ Artefactos de VF completos |
-| **Soporte** | Comunidad | SLA 4h | SLA 15m + Operaciones 24/7 |
-| **Precios** | **Gratis para siempre** | **Por asiento / uso** | **Contrato** |
+| Capacidad | Community (Free) | Scientific (Pago) | Government (Pago) |
+|-----------|------------------|-------------------|-------------------|
+| **Runtime verificación** | ✅ Completo | ✅ Completo | ✅ Completo |
+| **Síntesis políticas (TERNAL)** | ❌ | ✅ ML-genera políticas óptimas | ✅ Políticas workflows clasificados |
+| **Detección anomalías** | ❌ | ✅ ML análisis conductual | ✅ Correlación amenazas tiempo real |
+| **Automatización compliance** | ❌ | ✅ Reportes SOC2/ISO/FedRAMP | ✅ Evidencia auto STIG/CMMC |
+| **Integración HSM** | ❌ Claves software | ✅ PKCS#11 / Cloud HSM | ✅ HSM clasificado / air-gapped |
+| **Verificación formal** | ❌ | ✅ Pruebas Coq/Lean disponibles | ✅ Artefactos FV completos |
+| **Soporte** | Comunidad | SLA 4h | SLA 15m + 24/7 ops |
+| **Precio** | **Gratis para siempre** | **Por asiento / uso** | **Contrato** |
 
-> **TERNAL** = Nuestro motor de síntesis de políticas propietario + detector de anomalías ML + abstracción HSM + canalización de verificación formal.  
-> **Este crate es el entorno de verificación sobre el cual se ejecutan las licencias TERNAL.**  
+> **TERNAL** = Nuestro motor propietario de síntesis de políticas + detector ML anomalías + abstracción HSM + pipeline verificación formal.  
+> **Este crate es el runtime de verificación donde corren las licencias TERNAL.**  
 > Competimos con **Mythos, Replicated, Keygen, LicenseSpring** — y ganamos en:
-> - **Zero-heap** (todos ellos asignan memoria)
-> - **No_std** (requieren std/nube)
-> - **TPM2 nativo** (lo simulan)
-> - **Auditoría Merkle** (registran en archivos de texto)
-> - **Listos para WASM/kernel** (no lo están)
+> - **Zero-heap** (ellos todos alocan)
+> - **No_std** (ellos necesitan std/cloud)
+> - **TPM2 nativo** (ellos lo mockean)
+> - **Auditoría Merkle** (ellos loguean a archivos de texto)
+> - **WASM/kernel ready** (ellos no)
 
 ---
 
 ## 💻 Requisitos Mínimos de Hardware
 
-| Entorno | CPU | RAM | Almacenamiento | TPM | Notas |
-|-------------|-----|-----|---------|-----|-------|
-| **Verificación mínima (no_std)** | Cortex-M4 / RISC-V RV32IMC | **2 KB RAM** | 8 KB Flash | Opcional | Gestor de arranque/módulo kernel |
-| **Verificación estándar (std)** | x86_64 / ARM64 / RISC-V 64 | **64 KB** | 512 KB | Opcional | CLI, servicios, demonios |
-| **Sellado TPM2** | Cualquiera con TPM 2.0 | 1 MB | 2 MB | **Requerido** (PCR 0-7, 16) | Niveles Soberano/Empresarial |
-| **Auditoría Merkle (sqlite)** | x86_64 / ARM64 | 4 MB | 10 MB + log | Opcional | Cumplimiento/forense |
-| **Bindings de Python** | x86_64 / ARM64 | 8 MB | 5 MB | Opcional | Sobrecarga de PyO3 |
-| **WASM (navegador/edge)** | Cualquier destino WASM | 16 MB | 200 KB .wasm | N/A | wasm32-unknown-unknown |
+| Entorno | CPU | RAM | Storage | TPM | Notas |
+|---------|-----|-----|---------|-----|-------|
+| **Verify mínimo (no_std)** | Cortex-M4 / RISC-V RV32IMC | **2 KB RAM** | 8 KB Flash | Opcional | Bootloader/módulo kernel |
+| **Verify estándar (std)** | x86_64 / ARM64 / RISC-V 64 | **64 KB** | 512 KB | Opcional | CLI, servicios, daemons |
+| **TPM2 sealing** | Cualquiera con TPM 2.0 | 1 MB | 2 MB | **Requerido** (PCR 0-7, 16) | Tiers Soberano/Enterprise |
+| **Auditoría Merkle (sqlite)** | x86_64 / ARM64 | 4 MB | 10 MB + log | Opcional | Compliance/forense |
+| **Bindings Python** | x86_64 / ARM64 | 8 MB | 5 MB | Opcional | Overhead PyO3 |
+| **WASM (browser/edge)** | Cualquier target WASM | 16 MB | 200 KB .wasm | N/A | wasm32-unknown-unknown |
 
-### Huellas de Memoria en el Mundo Real
+### Footprints Reales
 
 ```bash
-# Verificación mínima no_std (ARM Cortex-M4)
+# Verify mínimo no_std (ARM Cortex-M4)
 $ cargo build --release --no-default-features --features crypto --target thumbv7em-none-eabihf
 $ size target/thumbv7em-none-eabihf/release/sase_forge_verify
    text    data     bss     dec     hex filename
    3842     0     512    4354    1102  # ~4 KB flash, 512 bytes RAM
 
-# Verificación estándar (x86_64 Linux)
+# Verify estándar (x86_64 Linux)
 $ cargo build --release --features crypto
 $ size target/release/sase_forge_verify
    text    data     bss     dec     hex filename
    142K     8K     12K    162K       # ~162 KB binario
 
-# WASM (navegador)
+# WASM (browser)
 $ cargo build --release --target wasm32-unknown-unknown --features wasm,crypto
 $ ls -lh target/wasm32-unknown-unknown/release/sase_forge_verify.wasm
-   184K  # ~184 KB comprimido con gzip a ~45 KB
+   184K  # ~184 KB gzipped a ~45 KB
 ```
 
 ---
@@ -299,15 +307,15 @@ $ ls -lh target/wasm32-unknown-unknown/release/sase_forge_verify.wasm
 ### Rust (Cargo)
 
 ```bash
-# Eliminar de Cargo.toml
+# Quita de Cargo.toml
 # [dependencies]
 # sase-forge-verify = "0.1"
 
-# Limpiar artefactos de compilación
+# Limpia artefactos de build
 cargo clean
 
-# O eliminar de la caché del registro
-cargo uninstall sase-forge-verify  # si está instalado como binario
+# O quita del cache del registry
+cargo uninstall sase-forge-verify  # si se instaló como binario
 ```
 
 ### Python (pip)
@@ -315,10 +323,10 @@ cargo uninstall sase-forge-verify  # si está instalado como binario
 ```bash
 pip uninstall sase-forge-verify
 # Elimina: paquete, bindings, archivos .so/.pyd
-# No se modifican archivos del sistema — pura instalación a nivel de usuario (user-site)
+# Sin archivos de sistema modificados — install puro user-site
 ```
 
-### Paquete del Sistema (deb/rpm/brew)
+### Paquete Sistema (deb/rpm/brew)
 
 ```bash
 # Debian/Ubuntu
@@ -336,15 +344,15 @@ scoop uninstall sase-forge-verify
 choco uninstall sase-forge-verify
 ```
 
-### WASM / Embebido
+### WASM / Embedded
 
 ```bash
-# Simplemente elimina el archivo .wasm o la imagen de firmware
+# Solo borra el archivo .wasm o imagen firmware
 rm your_app.wasm
-# Sin entorno de ejecución, sin registro, sin servicios en segundo plano
+# Sin runtime, sin registry, sin servicios background
 ```
 
-### Purga Completa (Todos los rastros)
+### Purga Completa (Todas las Huellas)
 
 ```bash
 # Rust
@@ -359,39 +367,39 @@ rm -rf ~/.cache/pip/*sase_forge_verify*
 sudo rm -rf /usr/lib/sase-forge-verify /usr/include/sase-forge-verify
 ```
 
-**Cero persistencia.** Sin demonios, sin servicios systemd, sin módulos del kernel, sin claves de registro, sin telemetría, sin "phone-home".
+**Cero persistencia.** Sin daemons, sin systemd services, sin módulos kernel, sin claves registry, sin telemetría, sin phone-home.
 
 ---
 
-## 📦 Matriz de Características
+## 📦 Matriz de Features
 
-| Característica | Descripción | Dependencias | Impacto en Tamaño |
-|---------|-------------|--------------|-------------|
-| `crypto` | **Requerido.** Verificar/firmar Ed25519 | `ed25519-dalek`, `zeroize` | +15 KB |
-| `std` | Soporte de biblioteca estándar | `std` | +5 KB |
+| Feature | Descripción | Dependencias | Impacto Tamaño |
+|---------|-------------|--------------|----------------|
+| `crypto` | **Requerido.** Ed25519 verify/sign | `ed25519-dalek`, `zeroize` | +15 KB |
+| `std` | Soporte standard library | `std` | +5 KB |
 | `python` | Bindings PyO3 | `std`, `pyo3` | +50 KB |
-| `tpm` | TPM2 Real vía TSS-ESAPI | `std`, `tss-esapi` | +200 KB |
-| `sqlite` | Registro de auditoría Merkle-DAG | `std`, `rusqlite` | +300 KB |
-| `wasm` | Soporte para destino WASM | `getrandom/js` | +10 KB |
+| `tpm` | TPM2 real vía TSS-ESAPI | `std`, `tss-esapi` | +200 KB |
+| `sqlite` | Log Merkle-DAG audit | `std`, `rusqlite` | +300 KB |
+| `wasm` | Soporte target WASM | `getrandom/js` | +10 KB |
 | `alloc` | `no_std` + alloc | `alloc` | +5 KB |
-| `zeroize` | Puesta a cero de secretos | `zeroize` | +2 KB |
+| `zeroize` | Zeroization secretos | `zeroize` | +2 KB |
 
-### Compilaciones Mínimas
+### Builds Mínimos
 
 ```toml
-# Mínimo absoluto: solo verificación, sin montículo, sin std
+# Mínimo absoluto: solo verify, sin heap, sin std
 [dependencies]
 sase-forge-verify = { version = "0.1", default-features = false, features = ["crypto"] }
 
-# Gestor de arranque embebido (Cortex-M)
+# Bootloader embebido (Cortex-M)
 [dependencies]
 sase-forge-verify = { version = "0.1", default-features = false, features = ["crypto", "alloc"] }
 
-# WASM para navegador
+# WASM para browser
 [dependencies]
 sase-forge-verify = { version = "0.1", default-features = false, features = ["crypto", "wasm"] }
 
-# Funciones completas (la mayoría de las apps)
+# Full featured (mayoría apps)
 [dependencies]
 sase-forge-verify = { version = "0.1", features = ["std", "crypto", "python", "tpm", "sqlite", "wasm"] }
 ```
@@ -401,41 +409,41 @@ sase-forge-verify = { version = "0.1", features = ["std", "crypto", "python", "t
 ## 🔐 Propiedades de Seguridad
 
 | Propiedad | Implementación |
-|----------|----------------|
-| **Falsificación de Firma** | Ed25519 (RFC 8032) — 128-bit de seguridad |
-| **Ataques de Repetición** | Marca de tiempo + nonce, comparación de tiempo constante |
-| **Sustitución de Clave** | KeyID = BLAKE3(public_key) vinculado en licencia |
-| **Desviación de Reloj** | Tolerancia de sesgo configurable, tiempo constante |
-| **Canales Laterales** | Ruta de tiempo constante `verify_ct()` |
-| **Seguridad de Memoria** | Rust `no_std` + `zeroize` — secretos puestos a cero al liberar |
-| **Cadena de Suministro** | Serialización determinista `postcard`, sin proc-macros en ruta crítica |
-| **Vinculación TPM** | PCR 0-7, 16 — detecta modificaciones por bootkit/rootkit |
-| **Integridad de Auditoría** | Merkle-DAG + SQLite WAL — a prueba de manipulaciones |
+|-----------|----------------|
+| **Falsificación firma** | Ed25519 (RFC 8032) — seguridad 128-bit |
+| **Ataques replay** | Timestamp + nonce, comparación tiempo constante |
+| **Sustitución clave** | KeyID = BLAKE3(public_key) enlazado en licencia |
+| **Deriva reloj** | Tolerancia skew configurable, tiempo constante |
+| **Canales laterales** | `verify_ct()` path tiempo constante |
+| **Seguridad memoria** | Rust `no_std` + `zeroize` — secretos zeroed on drop |
+| **Supply chain** | Serialización `postcard` determinista, sin proc-macros en hot path |
+| **Binding TPM** | PCR 0-7, 16 — detecta modificación bootkit/rootkit |
+| **Integridad auditoría** | Merkle-DAG + SQLite WAL — tamper-evident |
 
 ---
 
 ## 📄 Licencia
 
-**Doble licencia** bajo su elección de:
-- **Licencia MIT** ([LICENSE-MIT](LICENSE-MIT))
-- **Licencia Apache 2.0** ([LICENSE-APACHE](LICENSE-APACHE))
+**Dual-licensed** bajo tu elección de:
+- **MIT License** ([LICENSE-MIT](LICENSE-MIT))
+- **Apache License 2.0** ([LICENSE-APACHE](LICENSE-APACHE))
 
-Esto se aplica **solo a este crate**. El stack propietario TERNAL (síntesis de políticas, detección de anomalías ML, abstracción HSM, verificación formal) **no está incluido** y requiere una licencia comercial.
+Esto aplica a **este crate solamente**. El stack propietario TERNAL (síntesis políticas, detección ML anomalías, abstracción HSM, verificación formal) **NO está incluido** y requiere licencia comercial.
 
 ---
 
 ## 🤝 Contribuir
 
-1. Haz un Fork del repositorio
-2. Crea una rama para la característica: `git checkout -b feat/caracteristica-increible`
-3. Ejecuta las pruebas: `cargo test --all-features`
-4. Ejecuta la verificación de zero-heap: `RUSTFLAGS="-DSASE_ZERO_HEAP=1" cargo test --no-default-features --features crypto`
-5. Envía un PR con una descripción clara
+1. Fork el repositorio
+2. Crea feature branch: `git checkout -b feat/amazing-feature`
+3. Corre tests: `cargo test --all-features`
+4. Check zero-heap: `RUSTFLAGS="-DSASE_ZERO_HEAP=1" cargo test --no-default-features --features crypto`
+4. Submit PR con descripción clara
 
-**Estándares de Código:**
-- Compatible con `no_std` por defecto
+**Estándares Código:**
+- `no_std` compatible por defecto
 - `const_fn` donde sea posible
-- Rutas críticas sin montículo marcadas con `zero_heap_hot_path!`
+- Hot paths zero-heap marcados con `zero_heap_hot_path!`
 - Todos los secretos implementan `ZeroizeOnDrop`
 - Documentación en todas las APIs públicas
 
@@ -444,19 +452,19 @@ Esto se aplica **solo a este crate**. El stack propietario TERNAL (síntesis de 
 ## 🔗 Enlaces
 
 - **Documentación**: https://docs.rs/sase-forge-verify
-- **Crates.io**: https://crates.io/crates/sase-forge-verify
+- **Crates.io**: https://crates.io/crates/sase-forge-verify  
 - **Repositorio**: https://github.com/bu25ny/sase-forge-verify
-- **Incidencias (Issues)**: https://github.com/bu25ny/sase-forge-verify/issues
+- **Issues**: https://github.com/bu25ny/sase-forge-verify/issues
 - **Consultas Comerciales**: licensing@sase-antigravity.dev
 
 ---
 
 ## 🏷️ Versionado
 
-[SemVer](https://semver.org/) — `MAYOR.MENOR.PARCHE`
+[SemVer](https://semver.org/) — `MAJOR.MINOR.PATCH`
 
-- **0.1.x**: Desarrollo inicial, la API puede cambiar
-- **1.0.0**: API estable, lista para producción
+- **0.1.x**: Desarrollo inicial, API puede cambiar
+- **1.0.0**: API estable, production-ready
 
 ---
 

@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .header-cell { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .tier-cell { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .feature-cell { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .cell-yes { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .cell-no { fill: #161b22; stroke: #30363d; stroke-width: 1; }
+      .text-header { fill: #58a6ff; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; text-anchor: middle; }
+      .text-tier { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600; text-anchor: middle; }
+      .text-feature { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; text-anchor: start; dominant-baseline: middle; }
+      .text-yes { fill: #3fb950; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .text-no { fill: #484f58; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 16px; font-weight: 400; text-anchor: middle; dominant-baseline: middle; }
+      .text-sub { fill: #8b949e; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10px; text-anchor: middle; }
+      .legend-text { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #ffffff; }
+        .header-cell, .tier-cell, .feature-cell, .cell-yes, .cell-no { fill: #f6f8fa; stroke: #d0d7de; }
+        .text-header { fill: #0969da; }
+        .text-tier, .text-feature { fill: #24292f; }
+        .text-yes { fill: #1a7f37; }
+        .text-no { fill: #969696; }
+        .text-sub { fill: #656d76; }
+        .legend-text { fill: #24292f; }
+      }
+    </style>
+  </defs>
+  
+  <rect class="bg" width="800" height="480"/>
+  
+  <!-- Title -->
+  <text x="400" y="28" class="text-header" style="font-size: 16px;">Matriz de Features por Tier</text>
+  <text x="400" y="46" class="text-sub">✅ = Incluido &nbsp;|&nbsp; ❌ = Requiere upgrade</text>
+  
+  <!-- Grid Layout -->
+  <!-- Columns: Feature(180), Free(90), Pro(90), Enterprise(90), Scientific(90), Sovereign(90), Government(90) = 720 total, centered at 40 -->
+  <g transform="translate(40, 65)">
+    <!-- Column widths -->
+    <!-- Header row -->
+    <rect x="0" y="0" width="180" height="35" class="header-cell"/>
+    <text x="90" y="22" class="text-header">Feature</text>
+    
+    <rect x="180" y="0" width="90" height="35" class="header-cell"/>
+    <text x="225" y="22" class="text-header">Free</text>
+    
+    <rect x="270" y="0" width="90" height="35" class="header-cell"/>
+    <text x="315" y="22" class="text-header">Pro</text>
+    
+    <rect x="360" y="0" width="90" height="35" class="header-cell"/>
+    <text x="405" y="22" class="text-header">Enterprise</text>
+    
+    <rect x="450" y="0" width="90" height="35" class="header-cell"/>
+    <text x="495" y="22" class="text-header">Scientific</text>
+    
+    <rect x="540" y="0" width="90" height="35" class="header-cell"/>
+    <text x="585" y="22" class="text-header">Sovereign</text>
+    
+    <rect x="630" y="0" width="90" height="35" class="header-cell"/>
+    <text x="675" y="22" class="text-header">Government</text>
+    
+    <!-- Data rows -->
+    <!-- Row 1: Ed25519 verify -->
+    <rect x="0" y="35" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="57" class="text-feature">Verificación Ed25519</text>
+    <text x="10" y="72" class="text-sub">tiempo constante, zero-heap</text>
+    <rect x="180" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="225" y="57" class="text-yes">✅</text>
+    <rect x="270" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="57" class="text-yes">✅</text>
+    <rect x="360" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="57" class="text-yes">✅</text>
+    <rect x="450" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="57" class="text-yes">✅</text>
+    <rect x="540" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="57" class="text-yes">✅</text>
+    <rect x="630" y="35" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="57" class="text-yes">✅</text>
+    
+    <!-- Row 2: HW Binding -->
+    <rect x="0" y="80" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="102" class="text-feature">Binding Hardware</text>
+    <text x="10" y="117" class="text-sub">CPU ID / huella custom</text>
+    <rect x="180" y="80" width="90" height="45" class="cell-no"/>
+    <text x="225" y="102" class="text-no">❌</text>
+    <rect x="270" y="80" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="102" class="text-yes">✅</text>
+    <rect x="360" y="80" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="102" class="text-yes">✅</text>
+    <rect x="450" y="80" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="102" class="text-yes">✅</text>
+    <rect x="540" y="80" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="102" class="text-yes">✅</text>
+    <rect x="630" y="80" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="102" class="text-yes">✅</text>
+    
+    <!-- Row 3: TPM2 PCR -->
+    <rect x="0" y="125" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="147" class="text-feature">TPM2 PCR Sealing</text>
+    <text x="10" y="162" class="text-sub">PCR 0-7, 16 · integridad boot</text>
+    <rect x="180" y="125" width="90" height="45" class="cell-no"/>
+    <text x="225" y="147" class="text-no">❌</text>
+    <rect x="270" y="125" width="90" height="45" class="cell-no"/>
+    <text x="315" y="147" class="text-no">❌</text>
+    <rect x="360" y="125" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="147" class="text-yes">✅</text>
+    <rect x="450" y="125" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="147" class="text-yes">✅</text>
+    <rect x="540" y="125" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="147" class="text-yes">✅</text>
+    <rect x="630" y="125" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="147" class="text-yes">✅</text>
+    
+    <!-- Row 4: Merkle Audit -->
+    <rect x="0" y="170" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="192" class="text-feature">Auditoría Merkle-DAG</text>
+    <text x="10" y="207" class="text-sub">SQLite WAL · tamper-evident</text>
+    <rect x="180" y="170" width="90" height="45" class="cell-no"/>
+    <text x="225" y="192" class="text-no">❌</text>
+    <rect x="270" y="170" width="90" height="45" class="cell-no"/>
+    <text x="315" y="192" class="text-no">❌</text>
+    <rect x="360" y="170" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="192" class="text-yes">✅</text>
+    <rect x="450" y="170" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="192" class="text-yes">✅</text>
+    <rect x="540" y="170" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="192" class="text-yes">✅</text>
+    <rect x="630" y="170" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="192" class="text-yes">✅</text>
+    
+    <!-- Row 5: WASM -->
+    <rect x="0" y="215" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="237" class="text-feature">WASM Ready</text>
+    <text x="10" y="252" class="text-sub">wasm32-unknown-unknown</text>
+    <rect x="180" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="225" y="237" class="text-yes">✅</text>
+    <rect x="270" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="237" class="text-yes">✅</text>
+    <rect x="360" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="237" class="text-yes">✅</text>
+    <rect x="450" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="237" class="text-yes">✅</text>
+    <rect x="540" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="237" class="text-yes">✅</text>
+    <rect x="630" y="215" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="237" class="text-yes">✅</text>
+    
+    <!-- Row 6: Python -->
+    <rect x="0" y="260" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="282" class="text-feature">Bindings Python</text>
+    <text x="10" y="297" class="text-sub">PyO3 · type hints completos</text>
+    <rect x="180" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="225" y="282" class="text-yes">✅</text>
+    <rect x="270" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="282" class="text-yes">✅</text>
+    <rect x="360" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="282" class="text-yes">✅</text>
+    <rect x="450" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="282" class="text-yes">✅</text>
+    <rect x="540" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="282" class="text-yes">✅</text>
+    <rect x="630" y="260" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="282" class="text-yes">✅</text>
+    
+    <!-- Row 7: Tier limits -->
+    <rect x="0" y="305" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="327" class="text-feature">Límites Tier</text>
+    <text x="10" y="342" class="text-sub">tokens/reqs/compute escalables</text>
+    <rect x="180" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="225" y="327" class="text-yes">10K/1K/1</text>
+    <rect x="270" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="327" class="text-yes">100M/10M/32</text>
+    <rect x="360" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="327" class="text-yes">1B/1B/256</text>
+    <rect x="450" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="327" class="text-yes">∞/∞/∞</text>
+    <rect x="540" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="327" class="text-yes">∞/∞/∞</text>
+    <rect x="630" y="305" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="327" class="text-yes">∞/∞/∞</text>
+    
+    <!-- Row 8: 64 features -->
+    <rect x="0" y="350" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="372" class="text-feature">64 Features (8 cats)</text>
+    <text x="10" y="387" class="text-sub">Core/Net/Sec/Obs/Pol/Adv/Gov</text>
+    <rect x="180" y="350" width="90" height="45" class="cell-no"/>
+    <text x="225" y="372" class="text-no">❌</text>
+    <rect x="270" y="350" width="90" height="45" class="cell-yes"/>
+    <text x="315" y="372" class="text-yes">✅</text>
+    <rect x="360" y="350" width="90" height="45" class="cell-yes"/>
+    <text x="405" y="372" class="text-yes">✅</text>
+    <rect x="450" y="350" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="372" class="text-yes">✅</text>
+    <rect x="540" y="350" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="372" class="text-yes">✅</text>
+    <rect x="630" y="350" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="372" class="text-yes">✅</text>
+    
+    <!-- Row 9: ML Anomaly -->
+    <rect x="0" y="395" width="180" height="45" class="feature-cell"/>
+    <text x="10" y="417" class="text-feature">ML Anomaly Detection</text>
+    <text x="10" y="432" class="text-sub">TERNAL SDK (propietario)</text>
+    <rect x="180" y="395" width="90" height="45" class="cell-no"/>
+    <text x="225" y="417" class="text-no">❌</text>
+    <rect x="270" y="395" width="90" height="45" class="cell-no"/>
+    <text x="315" y="417" class="text-no">❌</text>
+    <rect x="360" y="395" width="90" height="45" class="cell-no"/>
+    <text x="405" y="417" class="text-no">❌</text>
+    <rect x="450" y="395" width="90" height="45" class="cell-yes"/>
+    <text x="495" y="417" class="text-yes">✅</text>
+    <rect x="540" y="395" width="90" height="45" class="cell-yes"/>
+    <text x="585" y="417" class="text-yes">✅</text>
+    <rect x="630" y="395" width="90" height="45" class="cell-yes"/>
+    <text x="675" y="417" class="text-yes">✅</text>
+    
+    <!-- Row 10: Compliance -->
+    <rect x="0" y="440" width="180" height="40" class="feature-cell"/>
+    <text x="10" y="460" class="text-feature">Compliance Automation</text>
+    <text x="10" y="475" class="text-sub">SOC2/ISO/FedRAMP/STIG/CMMC</text>
+    <rect x="180" y="440" width="90" height="40" class="cell-no"/>
+    <text x="225" y="460" class="text-no">❌</text>
+    <rect x="270" y="440" width="90" height="40" class="cell-no"/>
+    <text x="315" y="460" class="text-no">❌</text>
+    <rect x="360" y="440" width="90" height="40" class="cell-no"/>
+    <text x="405" y="460" class="text-no">❌</text>
+    <rect x="450" y="440" width="90" height="40" class="cell-yes"/>
+    <text x="495" y="460" class="text-yes">✅</text>
+    <rect x="540" y="440" width="90" height="40" class="cell-yes"/>
+    <text x="585" y="460" class="text-yes">✅</text>
+    <rect x="630" y="440" width="90" height="40" class="cell-yes"/>
+    <text x="675" y="460" class="text-yes">✅</text>
+  </g>
+</svg>

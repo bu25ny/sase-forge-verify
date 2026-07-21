@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="500" viewBox="0 0 700 500">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; }
+      .box { fill: #161b22; stroke: #30363d; stroke-width: 1.5; rx: 8; ry: 8; }
+      .box-ok { fill: #161b22; stroke: #3fb950; stroke-width: 2; rx: 8; ry: 8; }
+      .box-fail { fill: #161b22; stroke: #f85149; stroke-width: 2; rx: 8; ry: 8; }
+      .text-title { fill: #e6edf3; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600; text-anchor: middle; }
+      .text-sub { fill: #8b949e; font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; text-anchor: middle; }
+      .text-code { fill: #a5d6ff; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12px; text-anchor: middle; }
+      .arrow { fill: none; stroke: #58a6ff; stroke-width: 2; marker-end: url(#arrowhead); }
+      .arrow-fail { stroke: #f85149; }
+      .arrow-ok { stroke: #3fb950; }
+      @media (prefers-color-scheme: light) {
+        .bg { fill: #ffffff; }
+        .box { fill: #f6f8fa; stroke: #d0d7de; }
+        .text-title { fill: #24292f; }
+        .text-sub { fill: #656d76; }
+        .text-code { fill: #0969da; }
+      }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#58a6ff" />
+    </marker>
+  </defs>
+  
+  <rect class="bg" width="700" height="500"/>
+  
+  <!-- Title -->
+  <text x="350" y="30" class="text-title" style="font-size: 18px; fill: #58a6ff;">SASE Forge Verify — Architecture Flow</text>
+  
+  <!-- Step 1: License Key -->
+  <rect x="250" y="45" width="200" height="55" class="box"/>
+  <text x="350" y="75" class="text-title">License Key (.key file)</text>
+  <text x="350" y="92" class="text-sub">postcard / JSON serialized</text>
+  
+  <!-- Arrow 1 -->
+  <path d="M350 100 V130" class="arrow"/>
+  
+  <!-- Step 2: verify_license -->
+  <rect x="200" y="130" width="300" height="55" class="box-ok"/>
+  <text x="350" y="160" class="text-title">verify_license(&key, &policy, timestamp)</text>
+  <text x="350" y="177" class="text-code">pub fn verify_license(key_bytes: &[u8], policy: &LicensePolicy, timestamp: u64) -> Result<(), VerifyError></text>
+  
+  <!-- Arrow 2 -->
+  <path d="M350 185 V215" class="arrow-ok"/>
+  
+  <!-- Step 3: Ed25519 Check -->
+  <rect x="120" y="215" width="220" height="65" class="box"/>
+  <text x="230" y="240" class="text-title">Ed25519 Signature Check</text>
+  <text x="230" y="258" class="text-sub">constant-time verify_ct()</text>
+  <text x="230" y="273" class="text-code">KeyID = BLAKE3(pubkey)</text>
+  
+  <!-- Fail path -->
+  <rect x="460" y="215" width="220" height="65" class="box-fail"/>
+  <text x="570" y="240" class="text-title" style="fill: #f85149;">❌ Invalid Signature</text>
+  <text x="570" y="258" class="text-sub" style="fill: #f85149;">VerifyError::InvalidSignature</text>
+  <text x="570" y="273" class="text-code" style="fill: #f85149;">return Err(e)</text>
+  
+  <!-- Arrow to fail -->
+  <path d="M340 248 H380" class="arrow-ok"/>
+  <path d="M380 248 H460" class="arrow-fail"/>
+  
+  <!-- Arrow from verify_license to Ed25519 -->
+  <path d="M350 185 V215" class="arrow-ok"/>
+  
+  <!-- Arrow from Ed25519 to Policy Enforcement -->
+  <path d="M230 280 V310" class="arrow-ok"/>
+  
+  <!-- Step 4: Policy Enforcement -->
+  <rect x="100" y="310" width="260" height="80" class="box-ok"/>
+  <text x="230" y="335" class="text-title">Policy Enforcement</text>
+  <text x="230" y="352" class="text-sub">tier · features · expiry · hw_fingerprint</text>
+  <text x="230" y="369" class="text-sub">max_tokens · max_requests · max_compute</text>
+  <text x="230" y="385" class="text-code">PolicyError::Expired / HwMismatch / QuotaExceeded</text>
+  
+  <!-- Arrow to TPM2 -->
+  <path d="M230 390 V420" class="arrow-ok"/>
+  
+  <!-- Step 5: TPM2 PCR Binding -->
+  <rect x="380" y="310" width="260" height="80" class="box"/>
+  <text x="510" y="335" class="text-title">TPM2 PCR Binding (optional)</text>
+  <text x="510" y="352" class="text-sub">PCR 0-7, 16 sealed to policy</text>
+  <text x="510" y="369" class="text-sub">Detects bootkit / rootkit tampering</text>
+  <text x="510" y="385" class="text-code">TpmError::PcrMismatch / SealFailed</text>
+  
+  <!-- Arrow to Merkle -->
+  <path d="M510 390 V420" class="arrow-ok"/>
+  
+  <!-- Step 6: Merkle-DAG Audit Log -->
+  <rect x="100" y="420" width="540" height="55" class="box"/>
+  <text x="370" y="445" class="text-title">Merkle-DAG Audit Log append (optional)</text>
+  <text x="370" y="463" class="text-sub">SQLite WAL · tamper-evident · forensic compliance</text>
+  
+  <!-- Arrow to final -->
+  <path d="M350 475 V495" class="arrow-ok"/>
+  
+  <!-- Step 7: Features Unlocked -->
+  <rect x="250" y="495" width="200" height="45" class="box-ok" style="stroke-width: 3;"/>
+  <text x="350" y="520" class="text-title" style="font-size: 15px; fill: #3fb950;">✅ App Features Unlocked</text>
+  
+  <!-- Fail arrows -->
+  <path d="M230 350 L100 350" class="arrow-fail" style="stroke-dasharray: 5,5;"/>
+  <text x="50" y="345" class="text-sub" style="fill: #f85149; font-size: 10px;">return Err</text>
+  <path d="M510 350 L600 350" class="arrow-fail" style="stroke-dasharray: 5,5;"/>
+  <text x="620" y="345" class="text-sub" style="fill: #f85149; font-size: 10px;">return Err</text>
+</svg>
